@@ -1,0 +1,2045 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gamblit-Style Demo Casino — Single File</title>
+<style>
+  :root{
+    --bg0:#04060a;
+    --bg1:#060a12;
+    --panel:#0f1117;
+    --panel2:#020617;
+    --text:#e5e7eb;
+    --muted:#9ca3af;
+    --muted2:#6b7280;
+    --green:#2efc6f;
+    --red:#ef4444;
+    --border:rgba(255,255,255,.10);
+    --shadow:0 18px 40px rgba(0,0,0,.55);
+    --shadowG:0 0 18px rgba(46,252,111,.20);
+    --r14:14px;
+    --r18:18px;
+    --r22:22px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 20% 0%, rgba(46,252,111,.06), transparent 60%),
+      radial-gradient(900px 500px at 90% 10%, rgba(56,189,248,.06), transparent 55%),
+      linear-gradient(180deg, var(--bg0), var(--bg1));
+    color:var(--text);
+  }
+
+  /* Layout */
+  .app{
+    display:grid;
+    grid-template-columns: 290px 1fr;
+    min-height:100vh;
+  }
+  @media (max-width: 980px){
+    .app{ grid-template-columns: 1fr; }
+  }
+
+  /* Sidebar */
+  .sidebar{
+    position:sticky;
+    top:0;
+    height:100vh;
+    padding:14px;
+    border-right:1px solid var(--border);
+    background: rgba(15,17,23,.55);
+    backdrop-filter: blur(10px);
+  }
+  @media (max-width: 980px){
+    .sidebar{ position:relative; height:auto; border-right:none; border-bottom:1px solid var(--border); }
+  }
+
+  .brand{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding:10px 12px;
+    border-radius:var(--r18);
+    background: linear-gradient(180deg, rgba(46,252,111,.10), rgba(2,6,23,.35));
+    border:1px solid rgba(46,252,111,.18);
+    box-shadow: var(--shadowG);
+  }
+  .logo{
+    width:38px;height:38px;
+    border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    background: rgba(46,252,111,.15);
+    border:1px solid rgba(46,252,111,.25);
+    font-weight:900;
+    color:var(--green);
+  }
+  .brand h1{
+    margin:0;
+    font-size:15px;
+    letter-spacing:.2px;
+    color:var(--green);
+  }
+  .brand .sub{ font-size:12px; color:var(--muted); margin-top:2px; }
+
+  .userBox{
+    margin-top:12px;
+    padding:12px;
+    border-radius:var(--r18);
+    background: rgba(2,6,23,.35);
+    border:1px solid var(--border);
+  }
+
+  .userRow{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .userRow .who{ font-weight:900; }
+
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.25);
+    color:var(--muted);
+    font-size:12px;
+    font-weight:800;
+    white-space:nowrap;
+  }
+  .pill b{ color:var(--text); }
+  .pill.green{ border-color: rgba(46,252,111,.25); color: rgba(46,252,111,.92); }
+  .pill.red{ border-color: rgba(239,68,68,.25); color: rgba(239,68,68,.92); }
+
+  .btn{
+    padding:10px 12px;
+    border-radius:14px;
+    background: rgba(8,16,16,.65);
+    color:var(--green);
+    border:1px solid rgba(46,252,111,.45);
+    cursor:pointer;
+    font-weight:900;
+    letter-spacing:.1px;
+    user-select:none;
+  }
+  .btn:hover{ background: rgba(46,252,111,.90); color:#000; }
+  .btn:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+    background: rgba(8,16,16,.65);
+    color:var(--muted);
+    border-color: rgba(255,255,255,.14);
+  }
+
+  .btnGhost{
+    padding:10px 12px;
+    border-radius:14px;
+    background: rgba(255,255,255,.03);
+    color:var(--text);
+    border:1px solid rgba(255,255,255,.10);
+    cursor:pointer;
+    font-weight:900;
+  }
+  .btnGhost:hover{ border-color: rgba(46,252,111,.45); box-shadow: var(--shadowG); }
+  .btnSmall{ padding:9px 10px; border-radius:12px; font-weight:900; }
+
+  .input{
+    width:100%;
+    padding:11px 12px;
+    border-radius:14px;
+    background: rgba(2,6,23,.65);
+    color:var(--text);
+    border:1px solid rgba(255,255,255,.10);
+    outline:none;
+  }
+  .input:focus{
+    border-color: rgba(46,252,111,.55);
+    box-shadow: 0 0 0 3px rgba(46,252,111,.12);
+  }
+
+  .subtle{ color:var(--muted); font-size:13px; }
+  .muted{ color:var(--muted2); }
+  .win{ color:var(--green); font-weight:1000; }
+  .loss{ color:var(--red); font-weight:1000; }
+  .hidden{ display:none !important; }
+
+  .divider{ height:1px; background: rgba(255,255,255,.08); margin:12px 0; }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .spacer{ flex:1; }
+
+  /* Main */
+  .main{ padding:18px; }
+  .topbar{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .search{
+    flex:1;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding:10px 12px;
+    border-radius:var(--r18);
+    background: rgba(15,17,23,.55);
+    border:1px solid rgba(255,255,255,.10);
+    backdrop-filter: blur(10px);
+  }
+  .search .dot{
+    width:10px;height:10px;border-radius:50%;
+    background: rgba(46,252,111,.75);
+    box-shadow: 0 0 14px rgba(46,252,111,.55);
+  }
+  .search b{ color:var(--green); }
+
+  .panel{
+    border-radius:var(--r22);
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(15,17,23,.55);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  .panelHead{
+    padding:14px 14px 10px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .panelHead .title{ font-weight:1000; letter-spacing:.2px; }
+  .panelBody{ padding:14px; }
+
+  .tag{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.14);
+    background: rgba(0,0,0,.25);
+    font-size:12px;
+    color:var(--muted);
+    font-weight:900;
+  }
+
+  /* ===== Gamblit-like home tiles ===== */
+  .homeWrap{ display:grid; gap:12px; }
+  .gameGrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));
+    gap:12px;
+  }
+  .gameTile{
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(2,6,23,.35);
+    padding:14px;
+    cursor:pointer;
+    user-select:none;
+    transition: transform .08s ease, border-color .12s ease, box-shadow .12s ease;
+  }
+  .gameTile:hover{
+    transform: translateY(-1px);
+    border-color: rgba(46,252,111,.35);
+    box-shadow: 0 0 18px rgba(46,252,111,.20);
+  }
+  .gameTileTop{ display:flex; align-items:center; gap:12px; }
+  .gameIconBox{
+    width:46px; height:46px;
+    border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.10);
+  }
+  .gameIconBox svg{
+    width:24px; height:24px;
+    fill:none;
+    stroke: rgba(46,252,111,.95);
+    stroke-width:2.2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+  .gameTileTitle{ font-weight:1000; }
+  .gameTileDesc{
+    margin-top:8px;
+    color: var(--muted);
+    font-size:12px;
+    line-height:1.35;
+  }
+
+  /* ===== Chat ===== */
+  #chatToggle{
+    position:fixed;
+    bottom:18px; right:18px;
+    width:54px; height:54px;
+    border-radius:18px;
+    background: rgba(46,252,111,.12);
+    border:1px solid rgba(46,252,111,.45);
+    color:var(--green);
+    font-weight:1000;
+    cursor:pointer;
+    box-shadow: var(--shadow);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    user-select:none;
+    z-index:60;
+  }
+  #chatBox{
+    position:fixed;
+    bottom:82px; right:18px;
+    width:330px; max-width:calc(100vw - 36px);
+    height:440px; max-height:calc(100vh - 120px);
+    border-radius:22px;
+    background: rgba(15,17,23,.78);
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+    z-index:60;
+    display:flex;
+    flex-direction:column;
+    backdrop-filter: blur(12px);
+  }
+  #chatBox.hidden{ display:none; }
+  #chatHeader{
+    padding:12px 12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  #chatHeader .title{ font-weight:1000; color:var(--green); }
+  #chatMessages{
+    flex:1;
+    padding:10px 12px;
+    overflow:auto;
+    background: rgba(2,6,23,.35);
+  }
+  .msg{
+    margin:8px 0;
+    padding:9px 10px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.08);
+    background: rgba(0,0,0,.22);
+  }
+  .msg .who{ font-weight:1000; font-size:12px; color:var(--muted); }
+  .msg .txt{ margin-top:4px; font-size:14px; }
+  #chatInputRow{
+    display:flex;
+    gap:8px;
+    padding:10px 12px;
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+
+  /* ===== Coinflip (Ladder) ===== */
+  .cfStage{
+    height:340px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,.10);
+    background: linear-gradient(180deg, rgba(46,252,111,.06), rgba(2,6,23,.42));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .cfCoin{
+    width:190px; height:190px;
+    border-radius:50%;
+    position:relative;
+    transform-style:preserve-3d;
+    filter: drop-shadow(0 20px 22px rgba(0,0,0,.55));
+    transform: rotateY(0deg);
+  }
+  .cfFace{
+    position:absolute; inset:0;
+    border-radius:50%;
+    backface-visibility:hidden;
+    display:flex; align-items:center; justify-content:center;
+    border:2px solid rgba(255,255,255,.14);
+    font-size:78px;
+    font-weight:1000;
+    letter-spacing:-2px;
+  }
+  .cfH{
+    background: radial-gradient(circle at 30% 30%, #fff0b3, #caa400);
+    color:#0b0b0b;
+  }
+  .cfT{
+    background: radial-gradient(circle at 30% 30%, #e5e7eb, #6b7280);
+    color:#0b0b0b;
+    transform: rotateY(180deg);
+  }
+  .cfFlipAnim{ animation: cfFlip 0.95s cubic-bezier(.2,.9,.2,1) forwards; }
+  @keyframes cfFlip{
+    0%   { transform: rotateY(0deg)   scaleX(1) }
+    35%  { transform: rotateY(240deg) scaleX(.62) }
+    70%  { transform: rotateY(540deg) scaleX(.55) }
+    100% { transform: rotateY(720deg) scaleX(1) }
+  }
+  .cfBanner{
+    position:absolute;
+    bottom:16px;
+    left:50%;
+    transform:translateX(-50%);
+    padding:8px 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.14);
+    background: rgba(0,0,0,.35);
+    font-weight:1000;
+    letter-spacing:.2px;
+  }
+  .cfBanner.win{ color:var(--green); border-color: rgba(46,252,111,.35); }
+  .cfBanner.loss{ color:var(--red); border-color: rgba(239,68,68,.35); }
+
+  .chips{ display:flex; gap:10px; overflow:auto; padding:2px 2px; }
+  .chip{
+    min-width:92px;
+    text-align:center;
+    padding:10px 12px;
+    border-radius:999px;
+    background: rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.10);
+    cursor:pointer;
+    user-select:none;
+    font-weight:1000;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .chip.active{
+    color:var(--green);
+    border-color: rgba(46,252,111,.45);
+    box-shadow: 0 0 0 3px rgba(46,252,111,.10);
+  }
+  .tabs{ display:flex; gap:10px; }
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:10px 12px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.10);
+    cursor:pointer;
+    user-select:none;
+    font-weight:1000;
+    background: rgba(2,6,23,.35);
+    color:var(--muted);
+  }
+  .tab.active{ color:var(--green); border-color: rgba(46,252,111,.45); }
+  .sidePick{ display:flex; gap:10px; }
+  .sideBtn{
+    flex:1;
+    padding:12px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(2,6,23,.35);
+    cursor:pointer;
+    font-weight:1000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    color:var(--muted);
+  }
+  .sideBtn.active{
+    color:var(--green);
+    border-color: rgba(46,252,111,.45);
+    box-shadow: 0 0 0 3px rgba(46,252,111,.10);
+  }
+
+  /* ===== Dice ===== */
+  .meter{
+    height:16px;
+    border-radius:999px;
+    background: rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.10);
+    overflow:hidden;
+  }
+  .meterFill{
+    height:100%;
+    width:50%;
+    background: linear-gradient(90deg, rgba(46,252,111,.9), rgba(46,252,111,.22));
+  }
+  .rollBox{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size:40px;
+    font-weight:1000;
+    padding:16px 18px;
+    border-radius:20px;
+    background: rgba(2,6,23,.65);
+    border:1px solid rgba(255,255,255,.10);
+    min-width:190px;
+    text-align:center;
+  }
+  .grid2{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
+  }
+  @media (max-width: 900px){
+    .grid2{ grid-template-columns: 1fr; }
+  }
+
+  /* ===== Mines ===== */
+  .minesGrid{
+    display:grid;
+    grid-template-columns: repeat(5, 56px);
+    gap:8px;
+    justify-content:center;
+    margin-top:10px;
+  }
+  .tile{
+    background: rgba(2,6,23,.65);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    aspect-ratio:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    user-select:none;
+    position:relative;
+    overflow:hidden;
+    font-weight:1000;
+  }
+  .tile:hover{ border-color: rgba(46,252,111,.35); }
+  .tile.locked{ cursor:default; }
+  .tile.safe{ background: rgba(46,252,111,.88); color:#000; border-color: rgba(0,0,0,.12); }
+  .tile.bomb{ background: rgba(239,68,68,.92); color:#fff; border-color: rgba(0,0,0,.12); }
+  .nextTag{
+    position:absolute;
+    bottom:6px;
+    right:6px;
+    font-size:10px;
+    color:rgba(255,255,255,.92);
+    background: rgba(0,0,0,.28);
+    border:1px solid rgba(255,255,255,.14);
+    padding:2px 6px;
+    border-radius:999px;
+  }
+
+  /* ===== Crash ===== */
+  .crashStage{
+    height:260px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,.10);
+    background: linear-gradient(180deg, rgba(46,252,111,.06), rgba(2,6,23,.42));
+    position:relative;
+    overflow:hidden;
+  }
+  .crashCenter{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    text-align:center;
+  }
+  .crashMult{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size:64px;
+    font-weight:1000;
+    letter-spacing:-1px;
+  }
+
+  /* ===== Battles ===== */
+  .battleItem{
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(2,6,23,.35);
+    padding:12px;
+    margin-top:10px;
+  }
+
+  /* Battle Viewer overlay */
+  #battleViewer{
+    position:fixed;
+    inset:0;
+    z-index:90;
+    background: rgba(4,6,10,.92);
+    backdrop-filter: blur(10px);
+    display:flex;
+    flex-direction:column;
+  }
+  #battleViewer.hidden{ display:none; }
+
+  .bvTop{
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-bottom:1px solid rgba(255,255,255,.10);
+    background: rgba(15,17,23,.65);
+  }
+  .bvTitle{ font-weight:1000; color:var(--green); }
+  .bvMeta{ font-size:13px; color:var(--muted); }
+  .bvBody{ flex:1; overflow:auto; padding:16px; }
+  .bvGrid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap:12px;
+  }
+  .bvPlayer{
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(15,17,23,.70);
+    box-shadow: var(--shadow);
+    padding:12px;
+  }
+  .bvPlayerTop{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .bvName{ font-weight:1000; }
+  .bvTotal{ font-size:13px; color:var(--muted); }
+  .reel{
+    position:relative;
+    height:64px;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.12);
+    background: linear-gradient(180deg, rgba(2,6,23,.8), rgba(0,0,0,.35));
+  }
+  .reel::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background: linear-gradient(180deg, rgba(0,0,0,.55), transparent 30%, transparent 70%, rgba(0,0,0,.55));
+    pointer-events:none;
+  }
+  .reelWindow{
+    position:absolute;
+    left:0; right:0;
+    top:50%;
+    transform: translateY(-50%);
+    height:38px;
+    border-top:1px solid rgba(46,252,111,.22);
+    border-bottom:1px solid rgba(46,252,111,.22);
+  }
+  .reelStrip{
+    position:absolute;
+    left:0; right:0;
+    top:0;
+    will-change: transform;
+  }
+  .reelRow{
+    height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:1000;
+    font-size:18px;
+  }
+  .reelRow small{
+    font-size:12px;
+    color:var(--muted);
+    margin-left:8px;
+  }
+  .reelResult{
+    margin-top:8px;
+    font-size:13px;
+    color:var(--muted);
+  }
+</style>
+</head>
+
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">G</div>
+      <div>
+        <h1>Gamblit Demo</h1>
+        <div class="sub">Single-file casino UI</div>
+      </div>
+    </div>
+
+    <div class="userBox" id="userBox"></div>
+
+    <div class="divider"></div>
+    <div class="subtle">Tip: open in 2 tabs to watch battles live.</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="search">
+        <div class="dot"></div>
+        <div><b id="crumb">Home</b> <span class="muted">• demo UI</span></div>
+      </div>
+      <button class="btnGhost" id="openChatBtn">Chat</button>
+      <button class="btnGhost" id="homeBtn">Home</button>
+    </div>
+
+    <div id="content"></div>
+  </main>
+</div>
+
+<!-- Chat -->
+<div id="chatToggle" title="Open chat">💬</div>
+<div id="chatBox" class="hidden">
+  <div id="chatHeader">
+    <div class="title">Chat</div>
+    <span class="tag" id="chatStatus">offline</span>
+    <span class="spacer"></span>
+    <button class="btnSmall btnGhost" id="chatCloseBtn">Close</button>
+  </div>
+  <div id="chatMessages"></div>
+  <div id="chatInputRow">
+    <input id="chatInput" class="input" placeholder="Type a message…" />
+    <button class="btnSmall btn" id="chatSendBtn">Send</button>
+  </div>
+</div>
+
+<!-- Battle Viewer -->
+<div id="battleViewer" class="hidden">
+  <div class="bvTop">
+    <div class="bvTitle" id="bvTitle">Battle</div>
+    <div class="bvMeta" id="bvMeta"></div>
+    <span class="spacer"></span>
+    <button class="btnSmall btnGhost" id="bvClose">Close</button>
+  </div>
+  <div class="bvBody">
+    <div class="bvGrid" id="bvGrid"></div>
+  </div>
+</div>
+
+<script>
+/* ===========================
+   Single-file Casino (Demo)
+=========================== */
+
+const HOUSE_EDGE = 0.01;
+const CRASH_MAX = 1000;
+
+const KEY_USERS_LAST = "demo_lastUser_v4";
+const KEY_BATTLES    = "demo_battles_v4";
+const KEY_CHAT       = "demo_chat_v4";
+
+/* Icons (inline SVG) */
+const ICONS = {
+  coin: `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <ellipse cx="12" cy="12" rx="8" ry="8"></ellipse>
+    <path d="M12 6v12"></path>
+    <path d="M9.2 9.2c.7-.7 1.7-1.2 2.8-1.2 2.2 0 4 1.8 4 4s-1.8 4-4 4c-1.1 0-2.1-.4-2.8-1.2"></path>
+  </svg>`,
+  dice: `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="5" y="5" width="14" height="14" rx="3"></rect>
+    <path d="M9 9h.01M15 15h.01M15 9h.01M9 15h.01"></path>
+  </svg>`,
+  slots: `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="6" y="7" width="12" height="12" rx="2"></rect>
+    <path d="M9 10h6M9 13h6M9 16h6"></path>
+    <path d="M18 9h2v4"></path>
+  </svg>`,
+  crash: `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M5 16l5-5 4 4 5-7"></path>
+    <path d="M5 19h14"></path>
+  </svg>`,
+  mines: `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="5"></circle>
+    <path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path>
+    <path d="M4.5 4.5l2.2 2.2M17.3 17.3l2.2 2.2M19.5 4.5l-2.2 2.2M6.7 17.3l-2.2 2.2"></path>
+  </svg>`,
+  battles: `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6 8h12l-1 11H7L6 8z"></path>
+    <path d="M9 8V6a3 3 0 0 1 6 0v2"></path>
+    <path d="M10 12h4"></path>
+  </svg>`
+};
+
+const $ = (id)=>document.getElementById(id);
+const escapeHtml = (s)=>String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+const fmt = (n)=>Number(n||0).toLocaleString("en-US");
+const clamp = (n,a,b)=>Math.max(a, Math.min(b,n));
+
+/* ===== Users ===== */
+let user=null;
+let balance=0;
+
+function getUserRecord(u){
+  try{ return JSON.parse(localStorage.getItem("user_"+u) || "{}"); }
+  catch{ return {}; }
+}
+function setUserRecord(u, rec){
+  localStorage.setItem("user_"+u, JSON.stringify(rec));
+}
+function saveUser(){
+  const rec = getUserRecord(user);
+  if(!rec.password) return;
+  rec.balance = balance;
+  setUserRecord(user, rec);
+  localStorage.setItem(KEY_USERS_LAST, user);
+  renderUserBox();
+}
+function renderUserBox(){
+  const box = $("userBox");
+  if(!user){
+    box.innerHTML = `
+      <div class="subtle" style="margin-bottom:10px">Login to play</div>
+      <input class="input" id="authUser" placeholder="Username">
+      <div style="height:10px"></div>
+      <input class="input" id="authPass" type="password" placeholder="Password">
+      <div style="height:10px"></div>
+      <div class="row">
+        <button class="btn" id="loginBtn">Login</button>
+        <button class="btnGhost" id="regBtn">Register</button>
+      </div>
+      <div class="subtle" style="margin-top:10px">Saved locally (localStorage).</div>
+    `;
+    $("loginBtn").onclick = login;
+    $("regBtn").onclick = register;
+    return;
+  }
+  box.innerHTML = `
+    <div class="userRow">
+      <div class="who">👤 ${escapeHtml(user)}</div>
+      <span class="pill green">💰 <b>${fmt(balance)}</b></span>
+    </div>
+    <div class="divider"></div>
+    <div class="row">
+      <button class="btnSmall btnGhost" id="resetBalBtn">Reset 10,000</button>
+      <button class="btnSmall btnGhost" id="logoutBtn">Logout</button>
+    </div>
+  `;
+  $("logoutBtn").onclick = logout;
+  $("resetBalBtn").onclick = ()=>{ balance=10000; saveUser(); };
+}
+function login(){
+  const u = $("authUser").value.trim();
+  const p = $("authPass").value;
+  if(!u || !p) return alert("Enter username + password");
+  const rec = getUserRecord(u);
+  if(rec.password !== p) return alert("Wrong login");
+  user = u;
+  balance = Number(rec.balance || 0);
+  saveUser();
+  chatBoot();
+  openView("home");
+}
+function register(){
+  const u = $("authUser").value.trim();
+  const p = $("authPass").value;
+  if(!u || !p) return alert("Enter username + password");
+  if(localStorage.getItem("user_"+u)) return alert("User exists");
+  setUserRecord(u, {password:p, balance:10000});
+  login();
+}
+function logout(){
+  localStorage.removeItem(KEY_USERS_LAST);
+  location.reload();
+}
+
+/* ===== Views ===== */
+let currentView="home";
+$("homeBtn").onclick = ()=> openView("home");
+
+function openView(name){
+  if(!user && name!=="home") return openView("home");
+  stopCrash();
+  mines=null;
+  cf=null;
+  currentView=name;
+
+  const map = {home:"Home", coin:"Coinflip", dice:"Dice", crash:"Crash", mines:"Mines", battles:"Case Battles", slots:"Slots"};
+  $("crumb").textContent = map[name] || "Home";
+
+  if(name==="home") renderHome();
+  if(name==="coin") renderCoinflip();
+  if(name==="dice") renderDice();
+  if(name==="crash") renderCrash();
+  if(name==="mines") renderMines();
+  if(name==="battles") renderBattles();
+  if(name==="slots") renderSlots();
+}
+
+function gameTile(key, title, desc){
+  return `
+    <div class="gameTile" data-game="${key}">
+      <div class="gameTileTop">
+        <div class="gameIconBox">${ICONS[key] || ""}</div>
+        <div>
+          <div class="gameTileTitle">${title}</div>
+          <div class="subtle">Gamblit vibe</div>
+        </div>
+      </div>
+      <div class="gameTileDesc">${desc}</div>
+    </div>
+  `;
+}
+function renderHome(){
+  $("content").innerHTML = `
+    <div class="panel">
+      <div class="panelHead">
+        <div class="title">Games</div>
+        <span class="tag">Tiles</span>
+      </div>
+      <div class="panelBody homeWrap">
+        ${!user ? `<div class="subtle">Login on the left sidebar to play.</div><div class="divider"></div>` : ``}
+        <div class="gameGrid" id="homeGrid">
+          ${gameTile("coin","Coinflip","Choose H/T • ladder flips • cashout")}
+          ${gameTile("dice","Dice","Chance slider • payout auto • animated roll")}
+          ${gameTile("slots","Slots","Simple jackpot demo")}
+          ${gameTile("crash","Crash","3-2-1 • rising multiplier • cashout")}
+          ${gameTile("mines","Mines","Real multipliers • next x on tiles")}
+          ${gameTile("battles","Case Battles","Persist • View battle • reel rolls")}
+        </div>
+      </div>
+    </div>
+  `;
+  document.querySelectorAll(".gameTile").forEach(el=>{
+    el.onclick = ()=> openView(el.dataset.game);
+  });
+}
+
+/* ===== Coinflip Ladder ===== */
+const COIN_LADDER = [1.92, 3.84, 7.68, 15.36, 30.72, 61.44, 122.88];
+let cf=null;
+
+function renderCoinflip(){
+  $("content").innerHTML = `
+    <div class="panel">
+      <div class="panelHead">
+        <div class="title">Coinflip</div>
+        <span class="tag">Ladder • Manual/Auto • Cashout</span>
+      </div>
+      <div class="panelBody">
+        <div class="cfStage" id="cfStage">
+          <div class="cfCoin" id="cfCoin">
+            <div class="cfFace cfH">H</div>
+            <div class="cfFace cfT">T</div>
+          </div>
+          <div class="cfBanner hidden" id="cfBanner"></div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <span class="pill">Flips: <b id="cfFlips">0</b></span>
+          <span class="pill">Target: <b id="cfTargetTxt">${COIN_LADDER[0].toFixed(2)}x</b></span>
+          <span class="pill">Pick: <b id="cfPickTxt">H</b></span>
+          <span class="spacer"></span>
+          <span class="subtle" id="cfHint">Manual: click stage to flip again.</span>
+        </div>
+
+        <div class="divider"></div>
+        <div class="chips" id="cfChips"></div>
+
+        <div class="divider"></div>
+        <div class="row">
+          <div class="tabs" style="flex:1; min-width:240px">
+            <div class="tab active" id="cfManual">Manual</div>
+            <div class="tab" id="cfAuto">Auto</div>
+          </div>
+          <span class="spacer"></span>
+          <button class="btnSmall btnGhost" id="cfReset">Reset</button>
+        </div>
+
+        <div style="height:10px"></div>
+        <div class="row">
+          <input id="cfBet" class="input" type="number" min="1" step="1" placeholder="Bet amount">
+          <button class="btnSmall btnGhost" id="cfHalf">½</button>
+          <button class="btnSmall btnGhost" id="cfDouble">2×</button>
+        </div>
+
+        <div style="height:10px"></div>
+        <div class="sidePick">
+          <button class="sideBtn active" id="cfPickH">🟡 Heads</button>
+          <button class="sideBtn" id="cfPickT">⚪ Tails</button>
+        </div>
+
+        <div style="height:12px"></div>
+        <button class="btn" style="width:100%; padding:14px 14px; border-radius:18px;" id="cfMainBtn">Fun Bet</button>
+        <div class="subtle" style="margin-top:10px" id="cfInfo"></div>
+      </div>
+    </div>
+  `;
+
+  const chips = $("cfChips");
+  chips.innerHTML = "";
+  COIN_LADDER.forEach((m,i)=>{
+    const d=document.createElement("div");
+    d.className="chip"+(i===0?" active":"");
+    d.textContent=m.toFixed(2)+"x";
+    d.onclick=()=> setCfTarget(i);
+    chips.appendChild(d);
+  });
+
+  cf = { mode:"manual", targetIndex:0, pick:"H", flips:0, running:false, bet:0, stageBound:false };
+
+  $("cfManual").onclick = ()=> setCfMode("manual");
+  $("cfAuto").onclick   = ()=> setCfMode("auto");
+  $("cfPickH").onclick  = ()=> setCfPick("H");
+  $("cfPickT").onclick  = ()=> setCfPick("T");
+  $("cfReset").onclick  = ()=> cfReset();
+  $("cfHalf").onclick   = ()=> { const v=Math.floor((+$("cfBet").value||0)/2); $("cfBet").value=v>0?v:""; };
+  $("cfDouble").onclick = ()=> { const v=Math.floor((+$("cfBet").value||0)*2); $("cfBet").value=v>0?v:""; };
+  $("cfMainBtn").onclick= ()=> cfMainAction();
+
+  if(!cf.stageBound){
+    cf.stageBound=true;
+    $("cfStage").addEventListener("click", ()=>{
+      if(cf && cf.running && cf.mode==="manual") cfDoFlip();
+    });
+  }
+
+  updateCfUI();
+}
+function setCfMode(mode){
+  if(cf.running) return;
+  cf.mode=mode;
+  $("cfManual").classList.toggle("active", mode==="manual");
+  $("cfAuto").classList.toggle("active", mode==="auto");
+  updateCfUI();
+}
+function setCfPick(p){
+  if(cf.running) return;
+  cf.pick=p;
+  $("cfPickH").classList.toggle("active", p==="H");
+  $("cfPickT").classList.toggle("active", p==="T");
+  updateCfUI();
+}
+function setCfTarget(i){
+  if(cf.running) return;
+  cf.targetIndex=i;
+  [...document.querySelectorAll("#cfChips .chip")].forEach((el,idx)=> el.classList.toggle("active", idx===i));
+  updateCfUI();
+}
+function updateCfUI(){
+  $("cfFlips").textContent=cf.flips;
+  $("cfTargetTxt").textContent=COIN_LADDER[cf.targetIndex].toFixed(2)+"x";
+  $("cfPickTxt").textContent=cf.pick;
+
+  const curMult = cf.flips>0 ? COIN_LADDER[Math.min(cf.flips-1, COIN_LADDER.length-1)] : 0;
+
+  $("cfPickH").disabled=cf.running;
+  $("cfPickT").disabled=cf.running;
+  $("cfBet").disabled=cf.running;
+  $("cfHalf").disabled=cf.running;
+  $("cfDouble").disabled=cf.running;
+  $("cfManual").style.pointerEvents=cf.running?"none":"auto";
+  $("cfAuto").style.pointerEvents=cf.running?"none":"auto";
+
+  if(!cf.running){
+    $("cfMainBtn").textContent="Fun Bet";
+    $("cfInfo").innerHTML=`Reach <b>${COIN_LADDER[cf.targetIndex].toFixed(2)}x</b> to auto-cashout in Auto mode.`;
+  }else{
+    $("cfMainBtn").textContent="Cash Out";
+    $("cfInfo").innerHTML=`Current: <b>${(curMult||1.00).toFixed(2)}x</b> • Target: <b>${COIN_LADDER[cf.targetIndex].toFixed(2)}x</b>`;
+  }
+}
+function hideCfBanner(){
+  const b=$("cfBanner");
+  b.classList.add("hidden");
+  b.classList.remove("win","loss");
+  b.textContent="";
+}
+function showCfBanner(txt,type){
+  const b=$("cfBanner");
+  b.textContent=txt;
+  b.classList.remove("hidden");
+  b.classList.toggle("win", type==="win");
+  b.classList.toggle("loss", type==="loss");
+}
+function cfReset(){
+  cf.running=false; cf.bet=0; cf.flips=0;
+  hideCfBanner();
+  updateCfUI();
+}
+function cfMainAction(){
+  if(!cf.running) return cfStart();
+  return cfCashout(false);
+}
+function cfStart(){
+  const b=Math.floor(+$("cfBet").value);
+  if(!Number.isFinite(b)||b<=0||b>balance) return;
+  balance-=b; saveUser();
+
+  cf.running=true; cf.bet=b; cf.flips=0;
+  hideCfBanner();
+  updateCfUI();
+
+  if(cf.mode==="auto") cfAutoLoop();
+  else cfDoFlip();
+}
+async function cfAutoLoop(){
+  const needed = cf.targetIndex+1;
+  while(cf.running && cf.flips < needed){
+    const w = await cfDoFlip();
+    if(!w) break;
+    await new Promise(r=>setTimeout(r, 320));
+  }
+  if(cf.running && cf.flips >= needed) cfCashout(true);
+}
+async function cfDoFlip(){
+  const coin=$("cfCoin");
+  const btn=$("cfMainBtn");
+  btn.disabled=true;
+
+  const result = Math.random()<0.5 ? "H":"T";
+  coin.classList.remove("cfFlipAnim");
+  void coin.offsetWidth;
+  coin.classList.add("cfFlipAnim");
+  await new Promise(r=>setTimeout(r, 950));
+  coin.style.transform = `rotateY(${result==="H"?0:180}deg)`;
+
+  const win = (result===cf.pick);
+  if(win){
+    cf.flips++;
+    showCfBanner("WIN","win");
+  }else{
+    showCfBanner("LOSE","loss");
+    cf.running=false;
+    cf.bet=0;
+    cf.flips=0;
+  }
+  updateCfUI();
+  btn.disabled=false;
+  return win;
+}
+function cfCashout(isAuto){
+  if(!cf.running) return;
+  if(cf.flips<=0){
+    cf.running=false; cf.bet=0;
+    hideCfBanner();
+    updateCfUI();
+    return;
+  }
+  const idx=Math.min(cf.flips-1, COIN_LADDER.length-1);
+  const mult=COIN_LADDER[idx];
+  const payout=Math.floor(cf.bet*mult);
+  const profit=payout-cf.bet;
+
+  balance+=payout; saveUser();
+  showCfBanner(isAuto?"AUTO CASHOUT":"CASHED OUT","win");
+
+  cf.running=false; cf.bet=0; cf.flips=0;
+  updateCfUI();
+  setTimeout(()=>hideCfBanner(), 1100);
+}
+
+/* ===== Dice ===== */
+function dicePayoutFromChance(chancePct){
+  const p=chancePct/100;
+  return (1 - HOUSE_EDGE) / p;
+}
+function renderDice(){
+  $("content").innerHTML=`
+    <div class="panel">
+      <div class="panelHead">
+        <div class="title">Dice</div>
+        <span class="tag">Chance ↔ payout • roll animation</span>
+      </div>
+      <div class="panelBody">
+        <div class="row">
+          <input id="diceBet" class="input" type="number" min="1" step="1" placeholder="Bet amount">
+          <button class="btnSmall btnGhost" id="diceHalf">½</button>
+          <button class="btnSmall btnGhost" id="diceDouble">2×</button>
+          <button class="btn" id="diceBtn">Roll</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid2">
+          <div>
+            <div class="row">
+              <span class="pill">Win chance <b id="diceChanceTag">50.00%</b></span>
+              <span class="pill">Payout <b id="dicePayoutTag">x1.98</b></span>
+            </div>
+            <div style="height:10px"></div>
+            <input id="diceChance" class="input" type="range" min="1" max="95" step="0.01" value="50">
+            <div style="height:10px"></div>
+            <div class="meter"><div class="meterFill" id="diceMeter"></div></div>
+            <div class="subtle" style="margin-top:10px">
+              Roll under <b id="diceTarget">50.00</b> to win.
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center">
+            <div class="rollBox" id="diceRoll">--.--</div>
+            <div id="diceRes" class="subtle" style="text-align:center"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  $("diceChance").oninput=updateDiceUI;
+  $("diceHalf").onclick=()=>{ const v=Math.floor((+$("diceBet").value||0)/2); $("diceBet").value=v>0?v:""; };
+  $("diceDouble").onclick=()=>{ const v=Math.floor((+$("diceBet").value||0)*2); $("diceBet").value=v>0?v:""; };
+  $("diceBtn").onclick=playDice;
+  updateDiceUI();
+}
+function updateDiceUI(){
+  const chance=Number($("diceChance").value);
+  $("diceChanceTag").textContent=chance.toFixed(2)+"%";
+  $("diceTarget").textContent=chance.toFixed(2);
+  $("diceMeter").style.width=clamp(chance,1,95)+"%";
+  const payout=dicePayoutFromChance(chance);
+  $("dicePayoutTag").textContent="x"+payout.toFixed(2);
+}
+async function playDice(){
+  const b=Math.floor(+$("diceBet").value);
+  if(!Number.isFinite(b)||b<=0||b>balance) return;
+
+  const chance=Number($("diceChance").value);
+  const payout=dicePayoutFromChance(chance);
+
+  balance-=b; saveUser();
+
+  $("diceBtn").disabled=true;
+  $("diceRes").textContent="Rolling…";
+
+  const final=Math.random()*100;
+  const start=performance.now();
+  const dur=900;
+
+  await new Promise(resolve=>{
+    const tick=(t)=>{
+      const k=clamp((t-start)/dur,0,1);
+      const jitter=(1-k)*(Math.random()*90+8);
+      const shown=clamp(final + (Math.random()<0.5?-1:1)*jitter,0,99.99);
+      $("diceRoll").textContent=shown.toFixed(2);
+      if(k>=1) return resolve();
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+
+  $("diceRoll").textContent=final.toFixed(2);
+  const win = final < chance;
+  if(win){
+    const winAmount=Math.floor(b*payout);
+    const profit=winAmount-b;
+    balance+=winAmount;
+    $("diceRes").innerHTML=`<span class="win">WIN</span> • +${fmt(profit)}`;
+  }else{
+    $("diceRes").innerHTML=`<span class="loss">LOSE</span> • -${fmt(b)}`;
+  }
+  saveUser();
+  $("diceBtn").disabled=false;
+}
+
+/* ===== Mines ===== */
+let mines=null;
+
+function comb(n,k){
+  if(k<0||k>n) return 0;
+  k=Math.min(k,n-k);
+  let num=1, den=1;
+  for(let i=1;i<=k;i++){
+    num *= (n - (k - i));
+    den *= i;
+  }
+  return num/den;
+}
+function minesProbSafeSoFar(bombs,k){
+  return comb(25-bombs,k) / comb(25,k);
+}
+function minesMult(bombs,k){
+  const p=minesProbSafeSoFar(bombs,k);
+  if(p<=0) return 0;
+  return (1 - HOUSE_EDGE) / p;
+}
+
+function renderMines(){
+  $("content").innerHTML=`
+    <div class="panel">
+      <div class="panelHead">
+        <div class="title">Mines</div>
+        <span class="tag">Real multipliers • next x labels</span>
+      </div>
+      <div class="panelBody">
+        <div class="row">
+          <input id="minesBet" class="input" type="number" min="1" step="1" placeholder="Bet amount">
+          <input id="minesBombs" class="input" type="number" min="1" max="24" step="1" placeholder="Bombs (1–24)">
+          <button class="btn" id="minesStart">Start</button>
+          <button class="btnGhost" id="minesCash" disabled>Cashout</button>
+        </div>
+
+        <div class="minesGrid" id="minesGrid"></div>
+
+        <div class="divider"></div>
+        <div id="minesInfo" class="subtle"></div>
+      </div>
+    </div>
+  `;
+  $("minesStart").onclick=startMines;
+  $("minesCash").onclick=cashoutMines;
+  mines=null;
+  $("minesInfo").textContent="Start a round to reveal safe tiles and cash out.";
+}
+
+function startMines(){
+  const b=Math.floor(+$("minesBet").value);
+  const nb=Math.floor(+$("minesBombs").value);
+  if(!Number.isFinite(b)||b<=0||b>balance) return;
+  if(!Number.isFinite(nb)||nb<1||nb>24) return alert("Bombs must be 1–24");
+
+  balance-=b; saveUser();
+
+  const bombSet=new Set();
+  while(bombSet.size<nb) bombSet.add(Math.floor(Math.random()*25));
+
+  mines={bet:b, bombs:nb, bombSet, revealed:new Set(), alive:true, safe:0};
+  $("minesCash").disabled=false;
+
+  const grid=$("minesGrid");
+  grid.innerHTML="";
+  for(let i=0;i<25;i++){
+    const t=document.createElement("div");
+    t.className="tile";
+    t.textContent="•";
+    t.onclick=()=> revealMine(i,t);
+    grid.appendChild(t);
+  }
+  updateMinesUI();
+}
+
+function updateMinesUI(){
+  if(!mines) return;
+  const k=mines.safe;
+  const mNow = k===0 ? 1.00 : minesMult(mines.bombs,k);
+  const mNext = minesMult(mines.bombs,k+1);
+  const cashVal=Math.floor(mines.bet*mNow);
+  const profit=cashVal-mines.bet;
+
+  $("minesInfo").innerHTML =
+    `Safe: <b>${k}</b> • Current: <b>${mNow.toFixed(2)}x</b> • Next: <b>${mNext.toFixed(2)}x</b><br>
+     Cashout profit now: <span class="${profit>=0?'win':'loss'}">${profit>=0?'+':''}${fmt(profit)}</span>`;
+
+  const tiles=$("minesGrid").children;
+  for(let i=0;i<tiles.length;i++){
+    const el=tiles[i];
+    el.querySelector(".nextTag")?.remove();
+    if(mines.alive && !mines.revealed.has(i)){
+      const tag=document.createElement("div");
+      tag.className="nextTag";
+      tag.textContent=mNext.toFixed(2)+"x";
+      el.appendChild(tag);
+    }
+  }
+}
+
+function revealMine(i,el){
+  if(!mines || !mines.alive) return;
+  if(mines.revealed.has(i)) return;
+
+  mines.revealed.add(i);
+  el.classList.add("locked");
+  el.querySelector(".nextTag")?.remove();
+
+  if(mines.bombSet.has(i)){
+    mines.alive=false;
+    el.classList.add("bomb");
+    el.textContent="💥";
+    $("minesCash").disabled=true;
+    $("minesInfo").innerHTML = `<span class="loss">BOOM</span> — round over`;
+
+    const tiles=$("minesGrid").children;
+    for(let t=0;t<tiles.length;t++){
+      const cell=tiles[t];
+      cell.querySelector(".nextTag")?.remove();
+      if(mines.bombSet.has(t)){
+        cell.classList.add("bomb");
+        cell.textContent="💣";
+      }else if(!mines.revealed.has(t)){
+        cell.textContent=" ";
+      }
+    }
+    return;
+  }
+
+  mines.safe++;
+  el.classList.add("safe");
+  el.textContent="✅";
+  updateMinesUI();
+}
+
+function cashoutMines(){
+  if(!mines || !mines.alive) return;
+  const k=mines.safe;
+  const mNow = k===0 ? 1.00 : minesMult(mines.bombs,k);
+  const payout=Math.floor(mines.bet*mNow);
+  const profit=payout-mines.bet;
+
+  balance+=payout; saveUser();
+
+  mines.alive=false;
+  $("minesCash").disabled=true;
+  $("minesInfo").innerHTML = `<span class="win">CASHED OUT</span> at <b>${mNow.toFixed(2)}x</b> • +${fmt(profit)}`;
+
+  const tiles=$("minesGrid").children;
+  for(const cell of tiles) cell.querySelector(".nextTag")?.remove();
+}
+
+/* ===== Crash ===== */
+let crash=null;
+
+function crashFairPoint(){
+  const u=Math.random();
+  let x=(1 - HOUSE_EDGE)/Math.max(1e-9,u);
+  x=Math.min(CRASH_MAX,x);
+  x=Math.max(1.00, Math.floor(x*100)/100);
+  return x;
+}
+function stopCrash(){
+  if(crash?.raf) cancelAnimationFrame(crash.raf);
+  crash=null;
+}
+function renderCrash(){
+  $("content").innerHTML=`
+    <div class="panel">
+      <div class="panelHead">
+        <div class="title">Crash</div>
+        <span class="tag">3-2-1 • rising • cashout</span>
+      </div>
+      <div class="panelBody">
+        <div class="row">
+          <input id="crashBet" class="input" type="number" min="1" step="1" placeholder="Bet amount">
+          <input id="crashAuto" class="input" type="number" min="1.01" step="0.01" placeholder="Auto cashout (optional)">
+          <button class="btn" id="crashStart">Bet & Start</button>
+          <button class="btnGhost" id="crashCash" disabled>Cashout</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="crashStage">
+          <div class="crashCenter">
+            <div class="crashMult" id="crashMult">1.00x</div>
+            <div class="subtle" id="crashMsg">Place a bet to start</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div id="crashRes" class="subtle"></div>
+        <div class="subtle" style="margin-top:8px">
+          Max: ${CRASH_MAX}x • Distribution ~ ${(100*(1-HOUSE_EDGE)).toFixed(0)}% / x.
+        </div>
+      </div>
+    </div>
+  `;
+  $("crashStart").onclick=startCrash;
+  $("crashCash").onclick=cashoutCrash;
+}
+async function startCrash(){
+  if(crash) return;
+  const b=Math.floor(+$("crashBet").value);
+  if(!Number.isFinite(b)||b<=0||b>balance) return;
+
+  const autoRaw=Number($("crashAuto").value);
+  const auto = Number.isFinite(autoRaw) && autoRaw>=1.01 ? clamp(autoRaw,1.01,CRASH_MAX) : null;
+
+  balance-=b; saveUser();
+  $("crashStart").disabled=true;
+  $("crashCash").disabled=false;
+  $("crashRes").textContent="";
+
+  for(let n=3;n>=1;n--){
+    $("crashMsg").innerHTML=`Starting in <b>${n}</b>…`;
+    await new Promise(r=>setTimeout(r, 550));
+  }
+
+  const crashPoint=crashFairPoint();
+  crash={bet:b, auto, crashPoint, startTime:performance.now(), mult:1.00, cashed:false, raf:null};
+
+  $("crashMsg").textContent = auto ? `Auto cashout: ${auto.toFixed(2)}x` : "Click cashout anytime";
+
+  const tick=(t)=>{
+    if(!crash) return;
+    const elapsed=(t-crash.startTime)/1000;
+
+    // rising curve (faster as it goes up)
+    const growth = 1 + elapsed*0.9;
+    let m = Math.exp(elapsed*0.56)*growth;
+    m = Math.min(m, crash.crashPoint+0.25);
+    m = Math.floor(m*100)/100;
+    if(m<1.00) m=1.00;
+
+    crash.mult=m;
+    $("crashMult").textContent=m.toFixed(2)+"x";
+
+    if(crash.auto && !crash.cashed && m>=crash.auto) cashoutCrash();
+
+    if(m >= crash.crashPoint){
+      $("crashMult").textContent = crash.crashPoint.toFixed(2)+"x";
+      $("crashMsg").innerHTML = `<span class="loss">CRASHED</span> at ${crash.crashPoint.toFixed(2)}x`;
+
+      if(!crash.cashed) $("crashRes").innerHTML = `<span class="loss">LOST</span> • -${fmt(crash.bet)}`;
+      else $("crashRes").innerHTML += ` <span class="muted">• you already cashed out ✅</span>`;
+
+      $("crashCash").disabled=true;
+      $("crashStart").disabled=false;
+      stopCrash();
+      return;
+    }
+
+    crash.raf=requestAnimationFrame(tick);
+  };
+  crash.raf=requestAnimationFrame(tick);
+}
+function cashoutCrash(){
+  if(!crash || crash.cashed) return;
+  crash.cashed=true;
+
+  const m=Math.max(1.00, crash.mult);
+  const payout=Math.floor(crash.bet*m);
+  const profit=payout-crash.bet;
+
+  balance+=payout; saveUser();
+  $("crashRes").innerHTML = `<span class="win">CASHED OUT</span> at <b>${m.toFixed(2)}x</b> • +${fmt(profit)}`;
+  $("crashCash").disabled=true;
+}
+
+/* ===== Slots ===== */
+function renderSlots(){
+  $("content").innerHTML=`
+    <div class="panel">
+      <div class="panelHead">
+        <div class="title">Slots</div>
+        <span class="tag">Simple demo</span>
+      </div>
+      <div class="panelBody">
+        <div class="row">
+          <input id="slotsBet" class="input" type="number" min="1" step="1" placeholder="Bet amount">
+          <button class="btn" id="slotsBtn">Spin</button>
+          <span class="subtle">15% jackpot x5</span>
+        </div>
+        <div class="divider"></div>
+        <div id="slotsRes" class="subtle"></div>
+      </div>
+    </div>
+  `;
+  $("slotsBtn").onclick=()=>{
+    const b=Math.floor(+$("slotsBet").value);
+    if(!Number.isFinite(b)||b<=0||b>balance) return;
+    balance-=b;
+
+    if(Math.random()<0.15){
+      const win=b*5;
+      balance+=win;
+      $("slotsRes").innerHTML=`<span class="win">JACKPOT</span> • +${fmt(win-b)}`;
+    }else{
+      $("slotsRes").innerHTML=`<span class="loss">LOSE</span> • -${fmt(b)}`;
+    }
+    saveUser();
+  };
+}
+
+/* ===== Case Battles ===== */
+const CASES = [
+  { name:"Starter", price:10, items:[{name:"0",value:0,chance:70},{name:"20",value:20,chance:25},{name:"100",value:100,chance:5}]},
+  { name:"Gold", price:250, items:[{name:"50",value:50,chance:60},{name:"300",value:300,chance:30},{name:"2000",value:2000,chance:10}]},
+  { name:"Diamond", price:1000, items:[{name:"200",value:200,chance:60},{name:"1500",value:1500,chance:30},{name:"10000",value:10000,chance:10}]}
+];
+
+let battles = loadBattles();
+
+function loadBattles(){
+  try{
+    const raw=localStorage.getItem(KEY_BATTLES);
+    const b=raw?JSON.parse(raw):[];
+    return Array.isArray(b)?b:[];
+  }catch{ return []; }
+}
+function saveBattles(){
+  localStorage.setItem(KEY_BATTLES, JSON.stringify(battles));
+}
+window.addEventListener("storage",(e)=>{
+  if(e.key===KEY_BATTLES){
+    battles=loadBattles();
+    if(!$("battleViewer").classList.contains("hidden")){
+      const id=$("battleViewer").dataset.battleId;
+      if(id) renderBattleViewer(id);
+    }
+    if(currentView==="battles") renderBattlesList();
+  }
+});
+
+function battleMaxPlayers(mode){
+  return mode==="1v1"?2:mode==="2v2"?4:6;
+}
+function battleCost(casesArr){
+  return (casesArr||[]).reduce((s,c)=>s+(Number(c.price)||0),0);
+}
+function rollItem(items){
+  let r=Math.random()*100, acc=0;
+  for(const it of items){
+    acc+=it.chance;
+    if(r<=acc) return it;
+  }
+  return items[items.length-1];
+}
+function ensureBattleFields(b){
+  b.status=b.status||"open";
+  b.timeline=b.timeline||null;
+  b.startedAt=b.startedAt||null;
+  b.finishedAt=b.finishedAt||null;
+  b.finalTotals=b.finalTotals||null;
+  return b;
+}
+
+function renderBattles(){
+  $("content").innerHTML=`
+    <div class="panel">
+      <div class="panelHead">
+        <div class="title">Case Battles</div>
+        <span class="tag">Persist • View • Reels</span>
+      </div>
+      <div class="panelBody">
+        <div class="row">
+          <button class="btn" id="battleCreateBtn">Create Battle</button>
+          <span class="subtle">Battles saved to localStorage.</span>
+        </div>
+        <div class="divider"></div>
+        <div id="battleList"></div>
+      </div>
+    </div>
+  `;
+  $("battleCreateBtn").onclick=renderCreateBattle;
+  renderBattlesList();
+}
+
+function renderBattlesList(){
+  const list=$("battleList");
+  list.innerHTML="";
+  if(battles.length===0){
+    list.innerHTML=`<div class="subtle">No battles yet.</div>`;
+    return;
+  }
+
+  battles.forEach((b,idx)=>{
+    b=ensureBattleFields(b);
+    const max=battleMaxPlayers(b.mode);
+    const cost=battleCost(b.cases);
+    const d=document.createElement("div");
+    d.className="battleItem";
+    d.innerHTML=`
+      <div class="row">
+        <div style="font-weight:1000">${escapeHtml(b.creator)}</div>
+        <span class="tag">${b.mode}</span>
+        <span class="tag">${b.status}</span>
+        <span class="spacer"></span>
+        <span class="subtle">Players <b>${(b.players||[]).length}/${max}</b></span>
+      </div>
+      <div class="subtle" style="margin-top:6px">
+        Cases: <b>${(b.cases||[]).map(c=>escapeHtml(c.name)).join(", ")||"—"}</b> • Cost/player: <b>${fmt(cost)}</b>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btnSmall btnGhost" data-view="${idx}">View</button>
+        <button class="btnSmall btnGhost" data-join="${idx}" ${(b.players||[]).length>=max || (b.players||[]).includes(user) ? "disabled":""}>Join</button>
+        ${b.creator===user && (b.players||[]).length<max && b.status==="open" ? `<button class="btnSmall btnGhost" data-bot="${idx}">Add Bot</button>` : ""}
+        ${b.creator===user && (b.players||[]).length===max && b.status==="open" ? `<button class="btnSmall btn" data-start="${idx}">Start</button>` : ""}
+        <span class="spacer"></span>
+        <button class="btnSmall btnGhost" data-del="${idx}">Delete</button>
+      </div>
+      <div class="subtle" style="margin-top:8px">Players: ${(b.players||[]).map(p=>escapeHtml(p)).join(", ")}</div>
+    `;
+    list.appendChild(d);
+  });
+
+  list.querySelectorAll("[data-view]").forEach(btn=> btn.onclick=()=> viewBattle(Number(btn.dataset.view)));
+  list.querySelectorAll("[data-join]").forEach(btn=> btn.onclick=()=> joinBattle(Number(btn.dataset.join)));
+  list.querySelectorAll("[data-bot]").forEach(btn=> btn.onclick=()=> addBot(Number(btn.dataset.bot)));
+  list.querySelectorAll("[data-start]").forEach(btn=> btn.onclick=()=> startBattle(Number(btn.dataset.start)));
+  list.querySelectorAll("[data-del]").forEach(btn=> btn.onclick=()=>{
+    const i=Number(btn.dataset.del);
+    battles.splice(i,1);
+    saveBattles();
+    renderBattlesList();
+  });
+}
+
+function renderCreateBattle(){
+  let selected=[];
+
+  $("content").innerHTML=`
+    <div class="panel">
+      <div class="panelHead">
+        <div class="title">Create Battle</div>
+        <button class="btnSmall btnGhost" id="backToBattles">Back</button>
+      </div>
+      <div class="panelBody">
+        <div class="row">
+          <span class="subtle">Mode</span>
+          <select id="battleMode" class="input" style="max-width:220px">
+            <option value="1v1">1v1</option>
+            <option value="2v2">2v2</option>
+            <option value="3v3">3v3</option>
+          </select>
+          <span class="spacer"></span>
+          <span class="pill">Total cost <b id="battleCost">0</b></span>
+        </div>
+
+        <div class="divider"></div>
+        <div class="subtle">Select cases:</div>
+        <div class="row" id="caseGrid" style="margin-top:10px"></div>
+
+        <div class="divider"></div>
+        <button class="btn" id="createBattleConfirm" style="width:100%; padding:14px 14px; border-radius:18px;">Create</button>
+      </div>
+    </div>
+  `;
+  $("backToBattles").onclick=()=> openView("battles");
+
+  const grid=$("caseGrid");
+  CASES.forEach(c=>{
+    const card=document.createElement("div");
+    card.className="battleItem";
+    card.style.cursor="pointer";
+    card.style.minWidth="170px";
+    card.innerHTML=`<div style="font-weight:1000">${escapeHtml(c.name)}</div><div class="subtle">Price: ${fmt(c.price)}</div>`;
+    card.onclick=()=>{
+      const exists=selected.includes(c);
+      if(exists){
+        selected=selected.filter(x=>x!==c);
+        card.style.outline="none";
+      }else{
+        selected.push(c);
+        card.style.outline="2px solid rgba(46,252,111,.65)";
+      }
+      $("battleCost").textContent=fmt(battleCost(selected));
+    };
+    grid.appendChild(card);
+  });
+
+  $("createBattleConfirm").onclick=()=>{
+    if(selected.length===0) return alert("Pick at least one case");
+    const cost=battleCost(selected);
+    if(cost>balance) return alert("Not enough balance");
+    balance-=cost; saveUser();
+
+    const b=ensureBattleFields({
+      id:"b_"+Date.now()+"_"+Math.random().toString(16).slice(2),
+      creator:user,
+      mode:$("battleMode").value,
+      cases:selected.map(c=>({name:c.name, price:c.price, items:c.items})),
+      players:[user],
+      status:"open"
+    });
+    battles.push(b);
+    saveBattles();
+    openView("battles");
+  };
+}
+
+function joinBattle(i){
+  const b=ensureBattleFields(battles[i]);
+  if(!b || b.status!=="open") return;
+  const max=battleMaxPlayers(b.mode);
+  if(b.players.length>=max) return alert("Battle full");
+  if(b.players.includes(user)) return;
+
+  const cost=battleCost(b.cases);
+  if(cost>balance) return alert("Not enough balance");
+  balance-=cost; saveUser();
+
+  b.players.push(user);
+  saveBattles();
+  renderBattlesList();
+}
+function addBot(i){
+  const b=ensureBattleFields(battles[i]);
+  if(!b || b.status!=="open") return;
+  const max=battleMaxPlayers(b.mode);
+  if(b.players.length>=max) return;
+
+  const bots=["Bot1","Bot2","Bot3","Bot4","Bot5","Bot6","Bot7","Bot8"];
+  let name, tries=0;
+  do{
+    name=bots[Math.floor(Math.random()*bots.length)];
+    tries++;
+  }while(b.players.includes(name) && tries<50);
+  if(b.players.includes(name)) name="Bot"+Math.floor(Math.random()*9000+1000);
+
+  b.players.push(name);
+  saveBattles();
+  renderBattlesList();
+}
+function buildBattleTimeline(b){
+  const events=[];
+  let t=0;
+  for(const cs of b.cases){
+    for(const p of b.players){
+      const it=rollItem(cs.items);
+      events.push({t, player:p, caseName:cs.name, itemName:it.name, value:it.value, caseItems:cs.items});
+      t+=1200;
+    }
+  }
+  return {duration:t, events};
+}
+function startBattle(i){
+  const b=ensureBattleFields(battles[i]);
+  if(!b || b.creator!==user || b.status!=="open") return;
+  const max=battleMaxPlayers(b.mode);
+  if(b.players.length!==max) return alert("Need full lobby to start");
+
+  b.status="running";
+  b.startedAt=Date.now();
+  b.timeline=buildBattleTimeline(b);
+  b.finalTotals=null;
+  b.finishedAt=null;
+  saveBattles();
+  openBattleViewer(b.id);
+}
+function viewBattle(i){
+  const b=ensureBattleFields(battles[i]);
+  if(!b) return;
+  openBattleViewer(b.id);
+}
+
+/* Viewer */
+$("bvClose").onclick=()=> closeBattleViewer();
+function openBattleViewer(id){
+  $("battleViewer").dataset.battleId=id;
+  $("battleViewer").classList.remove("hidden");
+  renderBattleViewer(id);
+}
+function closeBattleViewer(){
+  $("battleViewer").classList.add("hidden");
+  $("battleViewer").dataset.battleId="";
+}
+function findBattleById(id){
+  return battles.find(x=>(x.id||"")===id)||null;
+}
+function cssId(s){ return String(s).replace(/[^a-zA-Z0-9_]/g,"_"); }
+function makeReelStrip(caseItems){
+  const pool=[];
+  caseItems.forEach(it=>{
+    const reps=Math.max(2, Math.round(it.chance/5));
+    for(let i=0;i<reps;i++) pool.push(it);
+  });
+  const strip=[];
+  while(strip.length<40) strip.push(pool[Math.floor(Math.random()*pool.length)]);
+  return strip;
+}
+function renderBattleViewer(id){
+  const b=ensureBattleFields(findBattleById(id)||{});
+  if(!b.id) return;
+
+  $("bvTitle").textContent=`Battle • ${b.creator}`;
+  const max=battleMaxPlayers(b.mode);
+  const cost=battleCost(b.cases);
+  $("bvMeta").textContent=`${b.mode} • Players ${b.players.length}/${max} • Cases: ${b.cases.map(c=>c.name).join(", ")} • Cost/player: ${fmt(cost)}`;
+
+  const grid=$("bvGrid");
+  grid.innerHTML="";
+
+  b.players.forEach(p=>{
+    const box=document.createElement("div");
+    box.className="bvPlayer";
+    box.innerHTML=`
+      <div class="bvPlayerTop">
+        <div class="bvName">${escapeHtml(p)}</div>
+        <div class="bvTotal">Total: <b id="tot_${cssId(p)}">0</b></div>
+      </div>
+      <div class="reel">
+        <div class="reelStrip" id="strip_${cssId(p)}"></div>
+        <div class="reelWindow"></div>
+      </div>
+      <div class="reelResult" id="res_${cssId(p)}">Waiting…</div>
+    `;
+    grid.appendChild(box);
+  });
+
+  if(b.status==="finished" && b.finalTotals){
+    for(const [p,val] of Object.entries(b.finalTotals)){
+      $("tot_"+cssId(p)).textContent=val;
+      $("res_"+cssId(p)).textContent="Finished";
+    }
+    return;
+  }
+
+  if(b.status==="running" && b.timeline && b.startedAt){
+    playBattleToNow(b);
+  }
+}
+function playBattleToNow(b){
+  const now=Date.now();
+  const elapsed=now-b.startedAt;
+
+  const totals={};
+  b.players.forEach(p=> totals[p]=0);
+
+  for(const ev of b.timeline.events){
+    if(ev.t<=elapsed){
+      totals[ev.player]+=ev.value;
+      const rEl=$("res_"+cssId(ev.player));
+      if(rEl) rEl.innerHTML=`Opened <b>${escapeHtml(ev.caseName)}</b> → <b>${escapeHtml(ev.itemName)}</b> <span class="muted">(${ev.value})</span>`;
+    }
+  }
+  for(const [p,val] of Object.entries(totals)){
+    const tEl=$("tot_"+cssId(p));
+    if(tEl) tEl.textContent=val;
+  }
+
+  for(const ev of b.timeline.events){
+    if(ev.t>elapsed) setTimeout(()=> animateReelEvent(b.id, ev), ev.t - elapsed);
+  }
+
+  const remaining=Math.max(0, b.timeline.duration - elapsed);
+  setTimeout(()=> finishBattleIfDone(b.id), remaining+50);
+}
+function animateReelEvent(id, ev){
+  const b=findBattleById(id);
+  if(!b || b.status!=="running") return;
+
+  const stripEl=$("strip_"+cssId(ev.player));
+  if(!stripEl) return;
+
+  const stripItems=makeReelStrip(ev.caseItems);
+  stripItems.push({name:ev.itemName, value:ev.value});
+  stripItems.push({name:ev.itemName, value:ev.value});
+
+  stripEl.innerHTML="";
+  for(const it of stripItems){
+    const row=document.createElement("div");
+    row.className="reelRow";
+    row.innerHTML=`${escapeHtml(it.name)} <small>${escapeHtml(it.value)}</small>`;
+    stripEl.appendChild(row);
+  }
+
+  const rowH=64;
+  const maxOffset=(stripItems.length-2)*rowH;
+  const overspin=maxOffset - (Math.random()*4+2)*rowH;
+
+  stripEl.style.transition="none";
+  stripEl.style.transform="translateY(0px)";
+  stripEl.offsetHeight;
+
+  stripEl.style.transition="transform 1.05s cubic-bezier(.18,.86,.2,1)";
+  stripEl.style.transform=`translateY(-${overspin}px)`;
+
+  setTimeout(()=>{
+    stripEl.style.transition="transform 280ms ease-out";
+    stripEl.style.transform=`translateY(-${maxOffset}px)`;
+
+    const rEl=$("res_"+cssId(ev.player));
+    if(rEl) rEl.innerHTML=`Opened <b>${escapeHtml(ev.caseName)}</b> → <b>${escapeHtml(ev.itemName)}</b> <span class="muted">(${ev.value})</span>`;
+
+    const tEl=$("tot_"+cssId(ev.player));
+    if(tEl){
+      const cur=Number(tEl.textContent||0);
+      tEl.textContent=cur+ev.value;
+    }
+  }, 1100);
+}
+function finishBattleIfDone(id){
+  const b=findBattleById(id);
+  if(!b || b.status!=="running" || !b.timeline || !b.startedAt) return;
+  const elapsed=Date.now()-b.startedAt;
+  if(elapsed<b.timeline.duration) return;
+
+  const totals={};
+  b.players.forEach(p=> totals[p]=0);
+  for(const ev of b.timeline.events) totals[ev.player]+=ev.value;
+
+  b.finalTotals=totals;
+  b.status="finished";
+  b.finishedAt=Date.now();
+  saveBattles();
+
+  if(!$("battleViewer").classList.contains("hidden") && $("battleViewer").dataset.battleId===id){
+    renderBattleViewer(id);
+  }
+}
+
+/* ===== Chat ===== */
+let chatOpen=false;
+let chatBooted=false;
+
+function loadChat(){
+  try{
+    const raw=localStorage.getItem(KEY_CHAT);
+    const c=raw?JSON.parse(raw):[];
+    return Array.isArray(c)?c:[];
+  }catch{ return []; }
+}
+function saveChat(msgs){
+  localStorage.setItem(KEY_CHAT, JSON.stringify(msgs));
+}
+function chatOpenSet(open){
+  chatOpen=open;
+  $("chatBox").classList.toggle("hidden", !open);
+}
+$("chatToggle").onclick=()=> chatOpenSet(!chatOpen);
+$("chatCloseBtn").onclick=()=> chatOpenSet(false);
+$("openChatBtn").onclick=()=> chatOpenSet(true);
+
+function renderChat(){
+  const msgs=loadChat();
+  const box=$("chatMessages");
+  box.innerHTML="";
+  for(const m of msgs){
+    const div=document.createElement("div");
+    div.className="msg";
+    div.innerHTML=`<div class="who">${escapeHtml(m.who)}</div><div class="txt">${escapeHtml(m.txt)}</div>`;
+    box.appendChild(div);
+  }
+  box.scrollTop=box.scrollHeight;
+}
+function addChatMessage(who, txt){
+  const msgs=loadChat();
+  msgs.push({t:Date.now(), who, txt});
+  while(msgs.length>200) msgs.shift();
+  saveChat(msgs);
+  renderChat();
+}
+$("chatSendBtn").onclick=()=>{
+  if(!user) return;
+  const txt=$("chatInput").value.trim();
+  if(!txt) return;
+  $("chatInput").value="";
+  addChatMessage(user, txt);
+};
+$("chatInput").addEventListener("keydown",(e)=>{
+  if(e.key==="Enter") $("chatSendBtn").click();
+});
+function chatBoot(){
+  if(chatBooted) return;
+  chatBooted=true;
+  $("chatStatus").textContent="online";
+  renderChat();
+  setInterval(()=>{
+    if(!user) return;
+    if(Math.random()<0.10){
+      const bots=["Bot1","Bot2","Bot3","Bot4"];
+      const who=bots[Math.floor(Math.random()*bots.length)];
+      const lines=["gg","nice","rip","send it","big win?","unlucky","sheesh"];
+      addChatMessage(who, lines[Math.floor(Math.random()*lines.length)]);
+    }
+  }, 6500);
+}
+
+/* ===== Boot ===== */
+renderUserBox();
+(function autoLogin(){
+  const last=localStorage.getItem(KEY_USERS_LAST);
+  if(!last) return;
+  const rec=getUserRecord(last);
+  if(!rec.password) return;
+  user=last;
+  balance=Number(rec.balance||0);
+  renderUserBox();
+  chatBoot();
+})();
+openView("home");
+</script>
+</body>
+</html>
