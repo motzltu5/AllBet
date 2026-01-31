@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Demo Casino</title>
+<style>
+:root{
+--bg:#04060a; --card:#0f1117; --accent:#2efc6f; --glow:rgba(46,252,111,0.25); --text:#e5e7eb; --danger:#ef4444; --coin-head:#FFD700; --coin-tail:#A9A9A9;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;}
+#chatContainer{width:320px;background:var(--card);padding:12px;border-right:2px solid var(--glow);display:flex;flex-direction:column;gap:8px;height:100vh;position:fixed;left:0;top:0;}
+#chatHeader{display:flex;justify-content:space-between;align-items:center;}
+#chatHeader h3{margin:0;color:var(--accent);}
+#chatMessages{flex:1;overflow:auto;padding:8px;background:#06070a;border-radius:8px;border:1px solid rgba(255,255,255,0.02);font-size:13px;}
+.chatMsg{padding:6px 8px;border-radius:6px;margin-bottom:6px;background:rgba(46,252,111,0.04);}
+#chatInputRow{display:flex;gap:6px;}
+#chatInputRow input{flex:1;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.03);background:#020617;color:var(--text);}
+#chatInputRow button{padding:6px 10px;border-radius:6px;background:var(--card);color:var(--accent);border:1px solid rgba(46,252,111,0.08);cursor:pointer;}
+.main{margin-left:320px;padding:18px;width:calc(100% - 320px);height:100vh;overflow:auto;}
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;}
+.header h1{margin:0;color:var(--accent);text-shadow:0 0 10px var(--glow);font-size:20px;}
+.header .user{display:flex;align-items:center;gap:12px;}
+.balance{font-weight:700;color:var(--accent);background:rgba(46,252,111,0.03);padding:6px 10px;border-radius:8px;}
+.btn{background:#081010;border:1px solid rgba(46,252,111,0.08);color:var(--accent);padding:8px 10px;border-radius:8px;cursor:pointer;transition:0.2s;}
+.btn:hover{background:var(--accent);color:#04080a;}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px;margin-bottom:18px;}
+.card{background:var(--card);padding:14px;border-radius:10px;border:1px solid rgba(46,252,111,0.06);display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.6);}
+.card:hover{box-shadow:0 12px 30px var(--glow);transform:translateY(-4px);}
+.card img{width:64px;height:64px;object-fit:cover;}
+.panel{background:var(--card);border-radius:12px;padding:16px;border:2px solid var(--accent);box-shadow:0 0 12px var(--accent),0 0 24px var(--glow);margin-bottom:18px;}
+.row{display:flex;gap:12px;align-items:center;}
+.input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:#020617;color:var(--text);}
+.result{margin-top:10px;font-weight:700;}
+.result .win{color:var(--accent);}
+.result .loss{color:var(--danger);}
+.mines-grid{display:grid;grid-template-columns:repeat(5,52px);gap:6px;justify-content:center;margin-top:12px;}
+.mines-tile{width:52px;height:52px;background:#020617;border:2px solid var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;cursor:pointer;transition:0.2s;}
+.mines-tile.safe{background:var(--accent);color:#04080a;box-shadow:0 0 12px var(--glow);}
+.mines-tile.bomb{background:var(--danger);color:white;box-shadow:0 0 12px var(--danger);}
+.coin-wrap{display:flex;align-items:center;gap:12px;}
+.coin-container{perspective:1000px;width:90px;height:90px;position:relative;}
+#coinSVG{width:90px;height:90px;transform-style:preserve-3d;transition:transform 1s ease;}
+.face{position:absolute;inset:0;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#04080a;font-size:34px;backface-visibility:hidden;}
+.face.heads{background:var(--coin-head);transform:rotateY(0deg);}
+.face.tails{background:var(--coin-tail);transform:rotateY(180deg);}
+.slot-reels{display:flex;justify-content:space-between;margin-top:12px;font-size:40px;}
+.reel{width:30%;text-align:center;transition:0.1s;}
+.crash-bar{width:100%;height:200px;background:#111827;border-radius:10px;position:relative;margin-top:10px;overflow:hidden;}
+.crash-line{position:absolute;bottom:0;width:100%;height:2px;background:var(--accent);}
+@keyframes spinCoin {0%{transform: rotateY(0deg);}100%{transform: rotateY(1080deg);}}
+#coinSVG.spinning{animation: spinCoin 1s ease-in-out forwards;}
+@media (max-width:900px){#chatContainer{display:none}.main{margin-left:0;width:100%;}}
+</style>
+</head>
+<body>
+
+<div id="chatContainer">
+<div id="chatHeader"><h3>Live Chat</h3></div>
+<div id="chatMessages"></div>
+<div id="chatInputRow">
+<input id="chatText" placeholder="Message...">
+<button id="chatSend">Send</button>
+</div>
+</div>
+
+<div class="main">
+<div class="header">
+<h1>Ultimate Demo Casino</h1>
+<div class="user">
+<div id="userLabel">Guest</div>
+<div class="balance">Balance: <span id="balanceDisplay">1000</span></div>
+<button id="walletBtn" class="btn">Wallet</button>
+</div>
+</div>
+
+<div id="authPanel" class="panel" style="max-width:420px">
+<h3>Register / Login</h3>
+<input id="authUser" class="input" placeholder="username">
+<input id="authPass" class="input" type="password" placeholder="password">
+<div style="display:flex;gap:8px;margin-top:10px">
+<button id="btnRegister" class="btn">Register</button>
+<button id="btnLogin" class="btn">Login</button>
+<button id="btnLogout" class="btn" style="display:none">Logout</button>
+</div>
+<div id="authMsg" style="margin-top:8px;font-size:13px;color:rgba(255,255,255,0.6)"></div>
+</div>
+
+<div id="starter" class="games-grid">
+<div class="card" data-game="coin"><img src="https://i.imgur.com/4O2MzRJ.png"><div>Coin Flip</div></div>
+<div class="card" data-game="dice"><img src="https://i.imgur.com/7M17GRH.png"><div>Dice</div></div>
+<div class="card" data-game="slots"><img src="https://i.imgur.com/5a2S6ti.png"><div>Slots</div></div>
+<div class="card" data-game="crash"><img src="https://i.imgur.com/ECpQJqp.png"><div>Crash</div></div>
+<div class="card" data-game="mines"><img src="https://i.imgur.com/Yb9rUE4.png"><div>Mines</div></div>
+</div>
+
+<!-- Panels for each game -->
+<div id="panel-coin" class="panel" style="display:none">
+<h3>Coin Flip</h3>
+<div class="coin-wrap">
+<div class="coin-container"><div id="coinSVG"><div class="face heads">H</div><div class="face tails">T</div></div></div>
+<select id="coinChoice"><option value="heads">Heads</option><option value="tails">Tails</option></select>
+</div>
+<input id="coinBet" class="input" type="number" placeholder="Bet amount">
+<button id="coinFlipBtn" class="btn">Flip</button>
+<div id="coinResult" class="result"></div>
+<button class="btn" data-back>Back</button>
+</div>
+
+<div id="panel-dice" class="panel" style="display:none">
+<h3>Dice (Under/Over)</h3>
+<input id="diceNumber" class="input" type="number" placeholder="Pick 0-100">
+<select id="diceChoice" class="input"><option value="under">Under</option><option value="over">Over</option></select>
+<input id="diceBet" class="input" type="number" placeholder="Bet amount">
+<button id="diceRollBtn" class="btn">Roll Dice</button>
+<div id="diceResult" class="result"></div>
+<div id="dicePotential" class="result"></div>
+<button class="btn" data-back>Back</button>
+</div>
+
+<div id="panel-slots" class="panel" style="display:none">
+<h3>Slots</h3>
+<input id="slotBet" class="input" type="number" placeholder="Bet amount">
+<button id="slotsSpinBtn" class="btn">Spin</button>
+<div class="slot-reels">
+<div class="reel" id="reel1">🍒</div>
+<div class="reel" id="reel2">🍋</div>
+<div class="reel" id="reel3">💎</div>
+</div>
+<div id="slotResult" class="result"></div>
+<button class="btn" data-back>Back</button>
+</div>
+
+<div id="panel-crash" class="panel" style="display:none">
+<h3>Crash</h3>
+<input id="crashBet" class="input" type="number" placeholder="Bet amount">
+<button id="startCrashBtn" class="btn">Start Crash</button>
+<button id="cashOutBtn" class="btn" disabled>Cash Out</button>
+<div class="crash-bar"><div class="crash-line" id="crashLine"></div></div>
+<div id="crashMultiplier" class="result"></div>
+<div id="crashResult" class="result"></div>
+<button class="btn" data-back>Back</button>
+</div>
+
+<div id="panel-mines" class="panel" style="display:none">
+<h3>Mines</h3>
+<input id="minesBombs" class="input" type="number" placeholder="Bombs 1-24" min="1" max="24">
+<input id="minesBet" class="input" type="number" placeholder="Bet amount">
+<button id="startMinesBtn" class="btn">Start Mines</button>
+<button id="cashOutMinesBtn" class="btn" style="display:none">Cash Out</button>
+<div class="mines-grid" id="minesGrid"></div>
+<div id="minesResult" class="result"></div>
+<div id="minesMultiplier" class="result"></div>
+<button class="btn" data-back>Back</button>
+</div>
+
+<script>
+// --- USER / AUTH ---
+let currentUser=null,balance=1000;
+const balanceDisplay=document.getElementById('balanceDisplay');
+const userLabel=document.getElementById('userLabel');
+const chatMessages=document.getElementById('chatMessages');
+function updateUI(){balanceDisplay.textContent=balance;userLabel.textContent=currentUser||'Guest';document.getElementById('btnLogout').style.display=currentUser?'inline-block':'none';}
+function saveUserBalance(){if(!currentUser)return;localStorage.setItem('user_'+currentUser,JSON.stringify({balance:balance,password:JSON.parse(localStorage.getItem('user_'+currentUser)||'{}').password}));}
+
+// REGISTER / LOGIN
+document.getElementById('btnRegister').addEventListener('click',()=>{
+  const u=document.getElementById('authUser').value.trim();
+  const p=document.getElementById('authPass').value;
+  if(!u||!p){document.getElementById('authMsg').textContent='Enter username & password';return;}
+  if(localStorage.getItem('user_'+u)){document.getElementById('authMsg').textContent='User exists';return;}
+  localStorage.setItem('user_'+u,JSON.stringify({balance:1000,password:p}));doLogin(u);document.getElementById('authMsg').textContent='Registered & logged in';
+});
+document.getElementById('btnLogin').addEventListener('click',()=>{
+  const u=document.getElementById('authUser').value.trim();
+  const p=document.getElementById('authPass').value;
+  const s=localStorage.getItem('user_'+u);
+  if(!s){document.getElementById('authMsg').textContent='No such user';return;}
+  const obj=JSON.parse(s);if(obj.password!==p){document.getElementById('authMsg').textContent='Wrong password';return;}
+  doLogin(u);document.getElementById('authMsg').textContent='Logged in';
+});
+document.getElementById('btnLogout').addEventListener('click',()=>{currentUser=null;balance=1000;updateUI();document.getElementById('authPanel').style.display='block';document.getElementById('starter').style.display='grid';});
+function doLogin(u){currentUser=u;balance=JSON.parse(localStorage.getItem('user_'+u)||'{}').balance||1000;updateUI();document.getElementById('authPanel').style.display='none';document.getElementById('starter').style.display='grid';}
+
+// CHAT
+document.getElementById('chatSend').addEventListener('click',()=>{
+  const msg=document.getElementById('chatText').value.trim();
+  if(!msg||!currentUser)return;
+  const div=document.createElement('div');div.className='chatMsg';div.textContent=`${currentUser}: ${msg}`;
+  chatMessages.appendChild(div);chatMessages.scrollTop=chatMessages.scrollHeight;
+  document.getElementById('chatText').value='';
+});
+
+// GAME ICONS
+document.querySelectorAll('.card[data-game]').forEach(c=>{
+  c.addEventListener('click',()=>{const g=c.dataset.game;document.getElementById('starter').style.display='none';document.querySelectorAll('.panel').forEach(p=>p.style.display='none');document.getElementById('panel-'+g).style.display='block';});
+});
+
+// BACK BUTTONS
+document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.panel').forEach(p=>p.style.display='none');document.getElementById('starter').style.display='grid';}));
+
+// --- COIN FLIP ---
+document.getElementById('coinFlipBtn').addEventListener('click',()=>{
+  const bet=Number(document.getElementById('coinBet').value);
+  if(bet<=0||bet>balance){alert('Invalid bet');return;}
+  balance-=bet;updateUI();saveUserBalance();
+  const choice=document.getElementById('coinChoice').value;
+  const coinEl=document.getElementById('coinSVG'); coinEl.classList.add('spinning');
+  setTimeout(()=>{
+    coinEl.classList.remove('spinning');
+    const result=Math.random()<0.5?'heads':'tails';
+    if(result===choice){balance+=bet*2;document.getElementById('coinResult').innerHTML=`<span class="win">WIN! It was ${result}</span>`;}
+    else{document.getElementById('coinResult').innerHTML=`<span class="loss">LOST! It was ${result}</span>`;}
+    updateUI();saveUserBalance();
+  },1000);
+});
+
+// --- DICE ---
+document.getElementById('diceRollBtn').addEventListener('click',()=>{
+  const bet=Number(document.getElementById('diceBet').value);
+  const num=Number(document.getElementById('diceNumber').value);
+  const choice=document.getElementById('diceChoice').value;
+  if(bet<=0||bet>balance||num<0||num>100){alert('Invalid');return;}
+  balance-=bet;updateUI();saveUserBalance();
+  const chance=(choice==='over')?100-num:num;
+  const multiplier=(100/chance).toFixed(2);
+  document.getElementById('dicePotential').textContent=`Potential win: ${Math.floor(bet*multiplier)}`;
+  let i=0;let roll=0;
+  const interval=setInterval(()=>{
+    roll=Math.floor(Math.random()*101);
+    document.getElementById('diceResult').textContent=`Rolling: ${roll}`;
+    i++; if(i>10){clearInterval(interval);
+      let win=(choice==='over')?roll>num:roll<num;
+      if(win){balance+=Math.floor(bet*multiplier);document.getElementById('diceResult').innerHTML=`<span class="win">WIN! Rolled ${roll}</span>`;}
+      else{document.getElementById('diceResult').innerHTML=`<span class="loss">LOST! Rolled ${roll}</span>`;}
+      updateUI();saveUserBalance();
+    }
+  },100);
+});
+
+// --- SLOTS ---
+const symbols=['🍒','🍋','💎','7️⃣','🍀','🔔'];
+document.getElementById('slotsSpinBtn').addEventListener('click',()=>{
+  const bet=Number(document.getElementById('slotBet').value);
+  if(bet<=0||bet>balance){alert('Invalid');return;}
+  balance-=bet;updateUI();saveUserBalance();
+  let reels=[];
+  for(let i=0;i<3;i++){reels.push(symbols[Math.floor(Math.random()*symbols.length)]);}
+  document.getElementById('reel1').textContent=reels[0];
+  document.getElementById('reel2').textContent=reels[1];
+  document.getElementById('reel3').textContent=reels[2];
+  let win=0;
+  if(reels[0]===reels[1]&&reels[1]===reels[2]) win=bet*5;
+  else if(reels[0]===reels[1]||reels[1]===reels[2]||reels[0]===reels[2]) win=bet*2;
+  if(win>0){balance+=win;document.getElementById('slotResult').innerHTML=`<span class="win">WIN! +${win}</span>`;}
+  else{document.getElementById('slotResult').innerHTML=`<span class="loss">LOST!</span>`;}
+  updateUI();saveUserBalance();
+});
+
+// --- CRASH ---
+let crashActive=false,crashMultiplier=1,crashInterval=null;
+document.getElementById('startCrashBtn').addEventListener('click',()=>{
+  const bet=Number(document.getElementById('crashBet').value);
+  if(bet<=0||bet>balance){alert('Invalid bet');return;}
+  balance-=bet;updateUI();saveUserBalance();
+  crashActive=true;crashMultiplier=1;
+  document.getElementById('cashOutBtn').disabled=false;document.getElementById('crashResult').textContent='';
+  crashInterval=setInterval(()=>{
+    crashMultiplier=(crashMultiplier*1.02).toFixed(2);
+    document.getElementById('crashMultiplier').textContent=`Multiplier: x${crashMultiplier}`;
+    if(Math.random()<0.01){clearInterval(crashInterval);crashActive=false;document.getElementById('cashOutBtn').disabled=true;
+      document.getElementById('crashResult').innerHTML=`<span class="loss">Crashed! You lost ${bet}</span>`;}
+  },100);
+});
+document.getElementById('cashOutBtn').addEventListener('click',()=>{
+  if(!crashActive)return;
+  let bet=Number(document.getElementById('crashBet').value);
+  let won=Math.floor(bet*crashMultiplier); balance+=won; updateUI(); saveUserBalance();
+  clearInterval(crashInterval); crashActive=false;
+  document.getElementById('cashOutBtn').disabled=true;
+  document.getElementById('crashResult').innerHTML=`<span class="win">Cashed Out: ${won}</span>`;
+});
+
+// --- MINES ---
+let minesGrid=[]; let minesBet=0, minesBombs=5, minesActive=false, minesMultiplier=1;
+document.getElementById('startMinesBtn').addEventListener('click',()=>{
+  minesBet=Number(document.getElementById('minesBet').value);
+  minesBombs=Number(document.getElementById('minesBombs').value);
+  if(minesBet<=0||minesBet>balance||minesBombs<1||minesBombs>24){alert('Invalid');return;}
+  balance-=minesBet;updateUI();saveUserBalance();minesActive=true;minesMultiplier=1;
+  const grid=document.getElementById('minesGrid'); grid.innerHTML=''; minesGrid=[];
+  let bombIndexes=[];while(bombIndexes.length<minesBombs){let r=Math.floor(Math.random()*25);if(!bombIndexes.includes(r)) bombIndexes.push(r);}
+  for(let i=0;i<25;i++){
+    let div=document.createElement('div'); div.className='mines-tile'; div.dataset.index=i;
+    if(bombIndexes.includes(i)) div.dataset.type='bomb'; else div.dataset.type='safe';
+    div.addEventListener('click',()=>{if(!minesActive||div.classList.contains('safe')||div.classList.contains('bomb')) return;
+      if(div.dataset.type==='bomb'){div.classList.add('bomb');div.textContent='💣';minesActive=false;document.getElementById('minesResult').innerHTML=`<span class="loss">You hit a bomb!</span>`;}
+      else{div.classList.add('safe');div.textContent='✔'; minesMultiplier*=1.25;document.getElementById('minesMultiplier').textContent=`Multiplier: x${minesMultiplier.toFixed(2)}`;document.getElementById('cashOutMinesBtn').style.display='inline-block';}
+    }); grid.appendChild(div);minesGrid.push(div);
+  }
+});
+document.getElementById('cashOutMinesBtn').addEventListener('click',()=>{
+  if(!minesActive) return;
+  let won=Math.floor(minesBet*minesMultiplier); balance+=won;updateUI();saveUserBalance();
+  document.getElementById('minesResult').innerHTML=`<span class="win">Cashed Out: ${won}</span>`;minesActive=false;
+  document.getElementById('cashOutMinesBtn').style.display='none';
+});
+</script>
+</body>
+</html>
