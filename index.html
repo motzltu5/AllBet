@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>NEON CASINO • Single HTML Demo</title>
+<title>NEON CASINO • Single HTML Demo (Rewritten)</title>
 <style>
   :root{
     --bg0:#050514; --bg1:#07071a; --bg2:#050512;
@@ -181,7 +181,7 @@
   .tileTitle{font-weight:1000}
   .tileDesc{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.35}
 
-  /* Growtopia-ish placeholder tile (NO emojis) */
+  /* Simple Growtopia-ish placeholder (NO emoji requirement removed) */
   .gt{
     width:34px;height:34px;border-radius:12px;
     border:1px solid rgba(255,255,255,.14);
@@ -201,9 +201,11 @@
   .gtMini{width:26px;height:26px;border-radius:10px}
   .gtLg{width:46px;height:46px;border-radius:16px}
 
-  /* ===== Coinflip ===== */
+  /* ===== Coinflip (classic 1.98x) ===== */
+  .cfWrap{display:grid;grid-template-columns: 1.1fr .9fr;gap:12px}
+  @media (max-width: 900px){ .cfWrap{grid-template-columns:1fr} }
   .cfStage{
-    height:320px;border-radius:20px;border:1px solid rgba(255,255,255,.10);
+    height:300px;border-radius:20px;border:1px solid rgba(255,255,255,.10);
     background: linear-gradient(180deg, rgba(56,189,248,.06), rgba(3,5,26,.42));
     display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
   }
@@ -233,19 +235,6 @@
   }
   .cfBanner.win{ color:var(--g); border-color: rgba(46,252,111,.35); box-shadow: var(--glowG); }
   .cfBanner.loss{ color:var(--r); border-color: rgba(239,68,68,.35); box-shadow: var(--glowR); }
-  .chips{ display:flex; gap:10px; overflow:auto; padding:2px 2px; }
-  .chip{
-    min-width:92px;text-align:center;padding:10px 12px;border-radius:999px;
-    background: rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.10);
-    cursor:pointer;user-select:none;font-weight:1000;color:var(--muted);white-space:nowrap;
-  }
-  .chip.active{ color:var(--b); border-color: rgba(56,189,248,.55); box-shadow: 0 0 0 3px rgba(56,189,248,.10); }
-  .tabs{ display:flex; gap:10px; }
-  .tab{
-    flex:1;text-align:center;padding:10px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.10);
-    cursor:pointer;user-select:none;font-weight:1000;background: rgba(3,5,26,.35);color:var(--muted);
-  }
-  .tab.active{ color:var(--b); border-color: rgba(56,189,248,.55); }
 
   /* ===== Dice ===== */
   .meter{height:16px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);overflow:hidden}
@@ -288,19 +277,19 @@
   }
   .crashMult{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;font-size:64px;font-weight:1000;letter-spacing:-1px;}
 
-  /* ===== Case Battles ===== */
+  /* ===== Case Battles (reels in player slots) ===== */
   .cbTopbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .cbHeader{
     margin-top:12px;padding:12px;border-radius:18px;border:1px solid rgba(255,255,255,.10);
     background:rgba(3,5,26,.35);display:flex;align-items:center;justify-content:space-between;gap:12px;
   }
   .cbHeaderLeft{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .cbModePills{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .cbModePill{
-    padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
-    background:rgba(0,0,0,.18);font-weight:1000;font-size:12px;color:var(--muted);
+  .cbCaseRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .cbCaseChip{
+    display:flex;gap:10px;align-items:center;
+    padding:10px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.10);
+    background:rgba(0,0,0,.16);
   }
-  .cbCaseRow{display:flex;gap:10px;align-items:center}
   .cbCaseThumb{
     width:42px;height:42px;border-radius:14px;border:1px solid rgba(255,255,255,.12);
     background:rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;
@@ -310,43 +299,30 @@
   .cbSlots{
     margin-top:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
     background:rgba(0,0,0,.16);padding:14px;
-    display:grid;grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));gap:12px;
+    display:grid;grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));gap:12px;
   }
   .cbSlot{
-    height:180px;border-radius:18px;border:1px solid rgba(255,255,255,.10);background:rgba(3,5,26,.35);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;position:relative;
+    border-radius:18px;border:1px solid rgba(255,255,255,.10);background:rgba(3,5,26,.35);
+    padding:12px;
+    display:flex;flex-direction:column;gap:10px;position:relative;
   }
+  .cbSlotTop{display:flex;align-items:center;gap:10px}
   .cbAvatar{
-    width:72px;height:72px;border-radius:50%;border:2px solid rgba(167,139,250,.70);
-    background:rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:1000;
+    width:52px;height:52px;border-radius:50%;border:2px solid rgba(167,139,250,.70);
+    background:rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:1000;
   }
   .cbName{font-weight:1000}
   .cbWaiting{color:var(--muted);font-weight:1000}
-  .cbAddBot{position:absolute;bottom:12px;right:12px}
+  .cbAddBot{position:absolute;top:12px;right:12px}
 
-  .cbArena{
-    margin-top:14px;border-radius:18px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.16);padding:14px;
+  .cbMiniReel{
+    height:74px;border-radius:16px;border:1px solid rgba(255,255,255,.10);
+    background:linear-gradient(180deg, rgba(3,5,26,.80), rgba(0,0,0,.14));
+    position:relative;overflow:hidden;
   }
-  .cbArenaTop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-  .cbCurrentCase{display:flex;align-items:center;gap:10px;font-weight:1000}
-  .cbCurrentCase .cbCaseThumb{width:46px;height:46px}
-  .cbRoundInfo{color:var(--muted);font-weight:900}
-
-  .cbCols{margin-top:12px;display:grid;grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));gap:12px;}
-  .cbCol{border-radius:18px;border:1px solid rgba(255,255,255,.10);background:rgba(14,14,28,.70);overflow:hidden;}
-  .cbColHead{padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(255,255,255,.08);}
-  .cbColHead b{font-weight:1000}
-  .cbColHead .tot{color:var(--muted);font-size:12px;font-weight:900}
-
-  /* Horizontal reel */
-  .cbReel{
-    height:98px;position:relative;overflow:hidden;
-    border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);
-    background:linear-gradient(180deg, rgba(3,5,26,.80), rgba(0,0,0,.18));
-  }
-  .cbReel::after{
+  .cbMiniReel::after{
     content:"";position:absolute;inset:0;
-    background:linear-gradient(90deg, rgba(0,0,0,.60), transparent 18%, transparent 82%, rgba(0,0,0,.60));
+    background:linear-gradient(90deg, rgba(0,0,0,.65), transparent 18%, transparent 82%, rgba(0,0,0,.65));
     pointer-events:none;
   }
   .cbNeedle{
@@ -355,29 +331,19 @@
   }
   .cbStrip{position:absolute;top:0;left:0;height:100%;display:flex;will-change:transform;transform:translateX(0px)}
   .cbItem{
-    width:170px;height:98px;display:flex;align-items:center;justify-content:center;gap:10px;
+    width:170px;height:74px;display:flex;align-items:center;justify-content:center;gap:10px;
     padding:10px 12px;border-right:1px solid rgba(255,255,255,.06);font-weight:1000;white-space:nowrap;
   }
   .cbItem small{display:block;font-size:12px;color:var(--muted);font-weight:900;margin-top:2px;text-align:left}
+  .cbLastWin{
+    border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.14);
+    padding:10px;
+  }
+  .cbLastWin b{font-weight:1000}
 
-  .cbWins{
-    display:grid;grid-template-columns: repeat(2, 1fr);gap:10px;padding:12px;max-height:320px;overflow:auto;
-  }
-  .cbWinCard{
-    border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(3,5,26,.40);padding:10px;text-align:center;
-  }
-  .cbWinIcon{
-    width:34px;height:34px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.18);
-    margin:0 auto;display:flex;align-items:center;justify-content:center;
-  }
-  .cbWinName{font-weight:1000;font-size:13px;margin-top:8px}
-  .cbWinVal{color:var(--muted);font-size:12px;font-weight:900;margin-top:4px}
-
-  /* ===== Modal ===== */
+  /* ===== Modal + Toast ===== */
   .modalBack{position:fixed;inset:0;background:rgba(0,0,0,.60);display:none;align-items:center;justify-content:center;z-index:100;}
-  .modal{width:min(900px, calc(100vw - 28px));border-radius:24px;border:1px solid rgba(255,255,255,.12);background:rgba(14,14,28,.94);box-shadow:var(--shadow);backdrop-filter:blur(12px);overflow:hidden}
-
-  /* ===== Toast ===== */
+  .modal{width:min(920px, calc(100vw - 28px));border-radius:24px;border:1px solid rgba(255,255,255,.12);background:rgba(14,14,28,.94);box-shadow:var(--shadow);backdrop-filter:blur(12px);overflow:hidden}
   #toastWrap{position:fixed;left:14px;bottom:14px;display:flex;flex-direction:column;gap:10px;z-index:90;max-width:min(420px, calc(100vw - 28px))}
   .toast{border-radius:18px;border:1px solid rgba(255,255,255,.12);background:rgba(14,14,28,.92);backdrop-filter:blur(10px);box-shadow:var(--shadow);padding:10px 12px}
   .toast .t1{font-weight:1000}
@@ -393,9 +359,7 @@
   .grid3{display:grid;grid-template-columns: 1fr 1fr 1fr;gap:12px}
   @media (max-width: 900px){ .grid3{grid-template-columns:1fr} }
   .panelBox{border-radius:20px;border:1px solid rgba(255,255,255,.10);background:rgba(3,5,26,.35);padding:12px}
-  .plinkoBoard{display:grid;grid-template-columns: repeat(9, 1fr);gap:6px;max-width:520px;margin:0 auto}
-  .peg{height:18px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.20)}
-  .slot{height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.20);display:flex;align-items:center;justify-content:center;font-weight:1000}
+
   .rouletteWheel{
     width:240px;height:240px;border-radius:50%;
     border:1px solid rgba(255,255,255,.14);
@@ -497,7 +461,7 @@
 
 <script>
 /* =======================
-   Helpers / Storage
+   Helpers / Storage / RNG
 ======================= */
 const $ = (id)=>document.getElementById(id);
 const escapeHtml = (s)=>String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
@@ -506,10 +470,6 @@ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
 function storageOK(){ try{ const k="__t"; localStorage.setItem(k,"1"); localStorage.removeItem(k); return true; }catch(e){ return false; } }
 const CAN_STORE = storageOK();
-
-const OWNER_NAME = "motzltu";
-const KEY_LAST = "nc_last_user_v1";
-const KEY_BATTLES = "nc_battles_v1";
 
 function toast(title, t1, t2="", ms=2600){
   const w=$("toastWrap");
@@ -521,7 +481,16 @@ function toast(title, t1, t2="", ms=2600){
   setTimeout(()=>{ d.style.opacity="0"; d.style.transform="translateY(4px)"; }, Math.max(300, ms-350));
   setTimeout(()=>{ d.remove(); }, ms);
 }
-function randInt(a,b){ return Math.floor(a + Math.random()*(b-a+1)); }
+
+// Crypto-strong random helpers
+function randFloat(){
+  const a=new Uint32Array(1);
+  crypto.getRandomValues(a);
+  return a[0]/0xFFFFFFFF;
+}
+function randInt(a,b){
+  return Math.floor(a + randFloat()*(b-a+1));
+}
 
 /* =======================
    Modal
@@ -536,14 +505,53 @@ $("modalClose").onclick=modalClose;
 $("modalBack").addEventListener("click",(e)=>{ if(e.target===$("modalBack")) modalClose(); });
 
 /* =======================
-   User / Auth
+   Users / Auth (fixed admin)
 ======================= */
+const OWNER_NAME = "motzltu";
+const KEY_LAST   = "nc_last_user_v2";
+const KEY_USERS  = "nc_users_index_v1";
+const KEY_BATTLES= "nc_battles_v2";
+
+function normUser(u){ return String(u||"").trim(); }
+function isOwner(u){ return String(u||"").toLowerCase()===OWNER_NAME.toLowerCase(); }
+
+function loadUsersIndex(){
+  try{
+    const raw=localStorage.getItem(KEY_USERS);
+    const arr=raw?JSON.parse(raw):[];
+    return Array.isArray(arr)?arr:[];
+  }catch{ return []; }
+}
+function saveUsersIndex(arr){
+  localStorage.setItem(KEY_USERS, JSON.stringify(arr));
+}
+function upsertUserIndex(username){
+  const u=normUser(username);
+  if(!u) return;
+  const idx=loadUsersIndex();
+  const exists = idx.some(x=>String(x).toLowerCase()===u.toLowerCase());
+  if(!exists){ idx.unshift(u); saveUsersIndex(idx.slice(0,200)); }
+}
+function findCanonicalUser(username){
+  const u=normUser(username);
+  if(!u) return null;
+  const idx=loadUsersIndex();
+  const hit = idx.find(x=>String(x).toLowerCase()===u.toLowerCase());
+  return hit || u; // fallback
+}
+
+function getUserRec(u){
+  const key="user_"+findCanonicalUser(u);
+  try{ return JSON.parse(localStorage.getItem(key)||"{}"); }catch{ return {}; }
+}
+function setUserRec(u, rec){
+  const canon=findCanonicalUser(u);
+  localStorage.setItem("user_"+canon, JSON.stringify(rec));
+  upsertUserIndex(canon);
+}
+
 let user=null;
 let balance=0;
-
-function isOwner(u){ return String(u||"").toLowerCase()===OWNER_NAME.toLowerCase(); }
-function getUserRec(u){ try{ return JSON.parse(localStorage.getItem("user_"+u)||"{}"); }catch{ return {}; } }
-function setUserRec(u, rec){ localStorage.setItem("user_"+u, JSON.stringify(rec)); }
 
 function saveUser(){
   if(!user) return;
@@ -555,27 +563,33 @@ function saveUser(){
   renderLeft();
   updateTopbar();
 }
+
 function login(){
-  const u=$("authUser").value.trim();
+  const u=normUser($("authUser").value);
   const p=$("authPass").value;
   if(!u||!p) return toast("Login","missing","Enter username + password.",2400);
-  const rec=getUserRec(u);
+
+  const canon=findCanonicalUser(u);
+  const rec=getUserRec(canon);
   if(rec.password!==p) return toast("Login","failed","Wrong username or password.",2600);
-  user=u;
+
+  user=canon;
   balance=Number(rec.balance||0);
   saveUser();
   toast("Welcome", user, "Logged in (demo).", 2200);
   openView("home");
 }
 function register(){
-  const u=$("authUser").value.trim();
+  const u=normUser($("authUser").value);
   const p=$("authPass").value;
   if(!u||!p) return toast("Register","missing","Enter username + password.",2400);
-  if(getUserRec(u).password) return toast("Register","failed","User already exists.",2600);
 
-  const startBal = isOwner(u) ? 999999 : 10000;
-  setUserRec(u,{password:p,balance:startBal});
-  user=u; balance=startBal;
+  const canon=findCanonicalUser(u);
+  if(getUserRec(canon).password) return toast("Register","failed","User already exists.",2600);
+
+  const startBal = isOwner(canon) ? 999999 : 10000;
+  setUserRec(canon,{password:p,balance:startBal});
+  user=canon; balance=startBal;
   saveUser();
   toast("Account","created",`+${fmt(startBal)} play coins.`, 2600);
   openView("home");
@@ -585,9 +599,15 @@ function logout(){
   location.reload();
 }
 
-/* Owner admin: typable nickname */
+/* Owner admin: fixed: dropdown + case-insensitive + guaranteed index */
 function openAdmin(){
   if(!user || !isOwner(user)) return toast("Admin","denied","Owner only.",2400);
+
+  const idx=loadUsersIndex().slice().sort((a,b)=>a.localeCompare(b));
+  const opts = idx.length
+    ? idx.map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join("")
+    : `<option value="">(no users yet)</option>`;
+
   modalOpen("Owner Admin", `
     <div class="row">
       <span class="pill owner"><b>OWNER:</b> ${escapeHtml(OWNER_NAME)}</span>
@@ -595,42 +615,62 @@ function openAdmin(){
       <span class="tag owner">admin</span>
     </div>
     <div class="divider"></div>
-    <div class="subtle">Type a player nickname to add/set balance.</div>
+
+    <div class="subtle">Pick a player to add/set balance (localStorage users index).</div>
     <div style="height:10px"></div>
+
     <div class="row">
       <div style="flex:1;min-width:220px">
-        <div class="subtle">Nickname</div>
-        <input class="input" id="admNick" placeholder="Type nickname (must exist)">
+        <div class="subtle">Player</div>
+        <select class="input" id="admSelect">${opts}</select>
       </div>
+      <div style="flex:1;min-width:220px">
+        <div class="subtle">Or type nickname</div>
+        <input class="input" id="admNick" placeholder="Type nickname">
+      </div>
+    </div>
+
+    <div style="height:10px"></div>
+    <div class="row">
       <div style="flex:1;min-width:220px">
         <div class="subtle">Amount</div>
         <input class="input" id="admAmt" type="number" min="0" step="1" placeholder="e.g. 5000">
       </div>
+      <div style="flex:none">
+        <button class="btnGhost btnOwner" id="admAdd">Add Balance</button>
+      </div>
+      <div style="flex:none">
+        <button class="btnGhost btnOwner" id="admSet">Set Balance</button>
+      </div>
     </div>
-    <div style="height:10px"></div>
-    <div class="row">
-      <button class="btnGhost btnOwner" id="admAdd">Add Balance</button>
-      <button class="btnGhost btnOwner" id="admSet">Set Balance</button>
-    </div>
+
     <div class="divider"></div>
-    <div class="subtle">User must exist (register first) since this is localStorage only.</div>
+    <div class="subtle">If you type a nickname, it will match case-insensitively against known users.</div>
   `);
-  $("admAdd").onclick=()=> adminAdjust("add");
-  $("admSet").onclick=()=> adminAdjust("set");
+
+  const pickNick=()=>{
+    const typed=normUser($("admNick").value);
+    const sel=normUser($("admSelect").value);
+    return typed || sel;
+  };
+
+  $("admAdd").onclick=()=> adminAdjust("add", pickNick());
+  $("admSet").onclick=()=> adminAdjust("set", pickNick());
 }
-function adminAdjust(mode){
-  const nick = ($("admNick").value||"").trim();
+function adminAdjust(mode, nickRaw){
+  const nick = normUser(nickRaw);
   const amt = Math.floor(+$("admAmt").value);
-  if(!nick) return toast("Admin","invalid","Type a nickname.",2400);
+  if(!nick) return toast("Admin","invalid","Pick or type a nickname.",2400);
   if(!Number.isFinite(amt) || amt<0) return toast("Admin","invalid","Enter amount >= 0.",2400);
 
-  const rec=getUserRec(nick);
-  if(!rec.password) return toast("Admin","not found","User must exist (register first).",2600);
+  const canon=findCanonicalUser(nick);
+  const rec=getUserRec(canon);
+  if(!rec.password) return toast("Admin","not found","User not found. Have them register first.",2600);
 
-  if(mode==="add"){ rec.balance = Number(rec.balance||0) + amt; setUserRec(nick, rec); toast("Admin","added",`${nick} +${fmt(amt)}`,2400); }
-  else { rec.balance = amt; setUserRec(nick, rec); toast("Admin","set",`${nick} = ${fmt(amt)}`,2400); }
+  if(mode==="add"){ rec.balance = Number(rec.balance||0) + amt; setUserRec(canon, rec); toast("Admin","added",`${canon} +${fmt(amt)}`,2400); }
+  else { rec.balance = amt; setUserRec(canon, rec); toast("Admin","set",`${canon} = ${fmt(amt)}`,2400); }
 
-  if(nick===user){ balance=Number(rec.balance||0); saveUser(); }
+  if(String(canon).toLowerCase()===String(user).toLowerCase()){ balance=Number(rec.balance||0); saveUser(); }
   modalClose();
 }
 
@@ -725,7 +765,7 @@ function renderLeft(){
             <span class="spacer"></span>
             <button class="btnGhost btnOwner" id="adminBtn">Admin</button>
           </div>
-          <div class="subtle" style="margin-top:8px">Type nick → add/set balance.</div>
+          <div class="subtle" style="margin-top:8px">Pick a user → add/set balance.</div>
         </div>
       `:""}
       <div class="divider"></div>
@@ -777,16 +817,16 @@ function openView(v){
   currentView=v;
 
   if(v==="home"){ currentTitle="Lobby"; currentSub="Choose a game"; renderHome(); }
-  else if(v==="coin"){ if(!requireLogin()) return; currentTitle="Coinflip"; currentSub="ladder • manual/auto • cashout"; renderCoin(); }
+  else if(v==="coin"){ if(!requireLogin()) return; currentTitle="Coinflip"; currentSub="classic • 1.98x • fast"; renderCoin(); }
   else if(v==="dice"){ if(!requireLogin()) return; currentTitle="Dice"; currentSub="chance slider • payout • roll"; renderDice(); }
-  else if(v==="slots"){ if(!requireLogin()) return; currentTitle="Slots"; currentSub="simple jackpot demo"; renderSlots(); }
+  else if(v==="slots"){ if(!requireLogin()) return; currentTitle="Slots"; currentSub="3-reel demo"; renderSlots(); }
   else if(v==="crash"){ if(!requireLogin()) return; currentTitle="Crash"; currentSub="3-2-1 • rising • cashout"; renderCrash(); }
   else if(v==="mines"){ if(!requireLogin()) return; currentTitle="Mines"; currentSub="multipliers • next x"; renderMines(); }
-  else if(v==="battles"){ if(!requireLogin()) return; currentTitle="Case Battles"; currentSub="ALL players roll at once"; renderBattlesList(); }
-  else if(v==="roulette"){ if(!requireLogin()) return; currentTitle="Roulette"; currentSub="red/black/green demo"; renderRoulette(); }
+  else if(v==="battles"){ if(!requireLogin()) return; currentTitle="Case Battles"; currentSub="pick cases • reels on players"; renderBattlesList(); }
+  else if(v==="roulette"){ if(!requireLogin()) return; currentTitle="Roulette"; currentSub="wheel angle = result (fixed)"; renderRoulette(); }
   else if(v==="plinko"){ if(!requireLogin()) return; currentTitle="Plinko"; currentSub="drop • buckets • multipliers"; renderPlinko(); }
   else if(v==="hilo"){ if(!requireLogin()) return; currentTitle="Hi-Lo"; currentSub="higher/lower streak"; renderHiLo(); }
-  else if(v==="wheel"){ if(!requireLogin()) return; currentTitle="Wheel"; currentSub="spin • segments"; renderWheel(); }
+  else if(v==="wheel"){ if(!requireLogin()) return; currentTitle="Wheel"; currentSub="angle = segment (fixed)"; renderWheel(); }
   else if(v==="keno"){ if(!requireLogin()) return; currentTitle="Keno"; currentSub="pick numbers • draw"; renderKeno(); }
 
   updateTopbar();
@@ -820,16 +860,16 @@ function renderHome(){
       <div class="cardBody">
         ${!user?`<div class="subtle">Login to play.</div><div class="divider"></div>`:""}
         <div class="gameGrid" id="homeGrid">
-          ${gameTile("Coinflip","Pick a side, ladder multipliers, cash out")}
+          ${gameTile("Coinflip","Classic 1.98x flip")}
           ${gameTile("Dice","Adjust win chance, payout, animated roll")}
-          ${gameTile("Slots","Simple jackpot demo")}
+          ${gameTile("Slots","3-reel spin demo")}
           ${gameTile("Crash","Rising multiplier, cash out before crash")}
           ${gameTile("Mines","Open safe tiles, next multiplier preview")}
-          ${gameTile("Case Battles","Horizontal reels • ALL players roll together")}
-          ${gameTile("Roulette","Red / Black / Green bets")}
+          ${gameTile("Case Battles","Pick cases • reels on player cards")}
+          ${gameTile("Roulette","Red / Black / Green bets (spin matches result)")}
           ${gameTile("Plinko","Drop ball into multiplier buckets")}
           ${gameTile("Hi-Lo","Predict higher/lower to build streak")}
-          ${gameTile("Wheel","Spin a wheel for multipliers")}
+          ${gameTile("Wheel","Spin segments (spin matches result)")}
           ${gameTile("Keno","Pick numbers, draw results")}
         </div>
       </div>
@@ -850,86 +890,66 @@ function renderHome(){
 }
 
 /* =======================
-   Coinflip (ladder)
+   Coinflip (classic)
+   - Payout: x1.98 (1% house edge)
 ======================= */
-const COIN_LADDER=[1.92, 3.84, 7.68, 15.36, 30.72, 61.44, 122.88];
+const HOUSE_EDGE = 0.01;
+const COIN_PAYOUT = 2 * (1 - HOUSE_EDGE); // 1.98
 function renderCoin(){
   $("content").innerHTML=`
     <div class="card">
       <div class="cardHead">
         <div class="title">Coinflip</div>
-        <span class="tag">ladder</span>
+        <span class="tag">x${COIN_PAYOUT.toFixed(2)}</span>
       </div>
       <div class="cardBody">
-        <div class="cfStage" id="cfStage">
-          <div class="cfCoin" id="cfCoin">
-            <div class="cfFace cfH">H</div>
-            <div class="cfFace cfT">T</div>
+        <div class="cfWrap">
+          <div class="cfStage" id="cfStage">
+            <div class="cfCoin" id="cfCoin">
+              <div class="cfFace cfH">H</div>
+              <div class="cfFace cfT">T</div>
+            </div>
+            <div class="cfBanner" id="cfBanner" style="display:none"></div>
           </div>
-          <div class="cfBanner" id="cfBanner" style="display:none"></div>
-        </div>
 
-        <div class="row" style="margin-top:12px">
-          <span class="pill">Flips: <b id="cfFlips">0</b></span>
-          <span class="pill">Target: <b id="cfTargetTxt">${COIN_LADDER[0].toFixed(2)}x</b></span>
-          <span class="pill">Pick: <b id="cfPickTxt">H</b></span>
-          <span class="spacer"></span>
-          <span class="subtle" id="cfHint">Manual: click stage to flip again.</span>
-        </div>
+          <div class="panelBox">
+            <div class="row">
+              <span class="pill">Pick <b id="cfPickTxt">H</b></span>
+              <span class="pill">Payout <b>x${COIN_PAYOUT.toFixed(2)}</b></span>
+              <span class="spacer"></span>
+              <button class="btnSmall btnGhost" id="cfReset">Reset</button>
+            </div>
 
-        <div class="divider"></div>
-        <div class="chips" id="cfChips"></div>
+            <div class="divider"></div>
 
-        <div class="divider"></div>
-        <div class="row">
-          <div class="tabs" style="flex:1; min-width:240px">
-            <div class="tab active" id="cfManual">Manual</div>
-            <div class="tab" id="cfAuto">Auto</div>
+            <div class="row">
+              <input id="cfBet" class="input" type="number" min="1" step="1" placeholder="Bet amount">
+              <button class="btnSmall btnGhost" id="cfHalf">½</button>
+              <button class="btnSmall btnGhost" id="cfDouble">2×</button>
+            </div>
+
+            <div style="height:10px"></div>
+            <div class="row" style="width:100%">
+              <button class="btnGhost" id="cfPickH" style="flex:1">Heads</button>
+              <button class="btnGhost" id="cfPickT" style="flex:1">Tails</button>
+            </div>
+
+            <div style="height:12px"></div>
+            <button class="btn btnGreen" style="width:100%; padding:14px; border-radius:18px" id="cfMainBtn">Flip</button>
+            <div class="subtle" style="margin-top:10px" id="cfInfo">Win doubles minus edge. Fast flips.</div>
           </div>
-          <span class="spacer"></span>
-          <button class="btnSmall btnGhost" id="cfReset">Reset</button>
         </div>
-
-        <div style="height:10px"></div>
-        <div class="row">
-          <input id="cfBet" class="input" type="number" min="1" step="1" placeholder="Bet amount">
-          <button class="btnSmall btnGhost" id="cfHalf">½</button>
-          <button class="btnSmall btnGhost" id="cfDouble">2×</button>
-        </div>
-
-        <div style="height:10px"></div>
-        <div class="row" style="width:100%">
-          <button class="btnGhost" id="cfPickH" style="flex:1">Heads</button>
-          <button class="btnGhost" id="cfPickT" style="flex:1">Tails</button>
-        </div>
-
-        <div style="height:12px"></div>
-        <button class="btn btnGreen" style="width:100%; padding:14px; border-radius:18px" id="cfMainBtn">Bet</button>
-        <div class="subtle" style="margin-top:10px" id="cfInfo"></div>
       </div>
     </div>
   `;
 
-  const chips=$("cfChips"); chips.innerHTML="";
-  COIN_LADDER.forEach((m,i)=>{
-    const d=document.createElement("div");
-    d.className="chip"+(i===0?" active":"");
-    d.textContent=m.toFixed(2)+"x";
-    d.onclick=()=>setCfTarget(i);
-    chips.appendChild(d);
-  });
-
-  cf={mode:"manual", targetIndex:0, pick:"H", flips:0, running:false, bet:0};
-
-  $("cfManual").onclick=()=>setCfMode("manual");
-  $("cfAuto").onclick=()=>setCfMode("auto");
+  cf={pick:"H", running:false};
   $("cfPickH").onclick=()=>setCfPick("H");
   $("cfPickT").onclick=()=>setCfPick("T");
-  $("cfReset").onclick=()=>cfReset();
+  $("cfReset").onclick=()=>{ hideCfBanner(); cf.running=false; updateCfUI(); };
   $("cfHalf").onclick=()=>{ const v=Math.floor((+$("cfBet").value||0)/2); $("cfBet").value=v>0?v:""; };
   $("cfDouble").onclick=()=>{ const v=Math.floor((+$("cfBet").value||0)*2); $("cfBet").value=v>0?v:""; };
-  $("cfMainBtn").onclick=()=>cfMainAction();
-  $("cfStage").onclick=()=>{ if(cf && cf.running && cf.mode==="manual") cfDoFlip(); };
+  $("cfMainBtn").onclick=()=>cfFlip();
 
   setCfPick("H");
   updateCfUI();
@@ -946,13 +966,6 @@ function hideCfBanner(){
   b.className="cfBanner";
   b.textContent="";
 }
-function setCfMode(m){
-  if(cf.running) return;
-  cf.mode=m;
-  $("cfManual").classList.toggle("active", m==="manual");
-  $("cfAuto").classList.toggle("active", m==="auto");
-  updateCfUI();
-}
 function setCfPick(p){
   if(cf.running) return;
   cf.pick=p;
@@ -960,88 +973,46 @@ function setCfPick(p){
   $("cfPickT").classList.toggle("active", p==="T");
   updateCfUI();
 }
-function setCfTarget(i){
-  if(cf.running) return;
-  cf.targetIndex=i;
-  [...document.querySelectorAll("#cfChips .chip")].forEach((el,idx)=>el.classList.toggle("active", idx===i));
-  updateCfUI();
-}
 function updateCfUI(){
-  $("cfFlips").textContent=cf.flips;
-  $("cfTargetTxt").textContent=COIN_LADDER[cf.targetIndex].toFixed(2)+"x";
   $("cfPickTxt").textContent=cf.pick;
-  const curMult = cf.flips>0 ? COIN_LADDER[Math.min(cf.flips-1, COIN_LADDER.length-1)] : 0;
-  if(!cf.running){
-    $("cfMainBtn").textContent="Bet";
-    $("cfInfo").innerHTML=`Reach <b>${COIN_LADDER[cf.targetIndex].toFixed(2)}x</b> to auto-cashout in Auto mode.`;
-  }else{
-    $("cfMainBtn").textContent="Cash Out";
-    $("cfInfo").innerHTML=`Current: <b>${(curMult||1.00).toFixed(2)}x</b> • Target: <b>${COIN_LADDER[cf.targetIndex].toFixed(2)}x</b>`;
-  }
+  $("cfMainBtn").disabled=cf.running;
 }
-function cfReset(){ cf.running=false; cf.bet=0; cf.flips=0; hideCfBanner(); updateCfUI(); }
-function cfMainAction(){ if(!cf.running) return cfStart(); return cfCashout(false); }
-function cfStart(){
+async function cfFlip(){
+  if(cf.running) return;
   const b=Math.floor(+$("cfBet").value);
   if(!Number.isFinite(b)||b<=0||b>balance) return toast("Bet","invalid","Check amount / balance.",2400);
+
   balance-=b; saveUser();
-  cf.running=true; cf.bet=b; cf.flips=0;
-  hideCfBanner(); updateCfUI();
-  if(cf.mode==="auto") cfAutoLoop();
-  else cfDoFlip();
-}
-async function cfAutoLoop(){
-  const needed=cf.targetIndex+1;
-  while(cf.running && cf.flips<needed){
-    const w=await cfDoFlip();
-    if(!w) break;
-    await sleep(320);
-  }
-  if(cf.running && cf.flips>=needed) cfCashout(true);
-}
-async function cfDoFlip(){
+  cf.running=true; updateCfUI();
+  hideCfBanner();
+
   const coin=$("cfCoin");
-  $("cfMainBtn").disabled=true;
-  const result=Math.random()<0.5 ? "H":"T";
-  coin.classList.remove("cfFlipAnim");
-  void coin.offsetWidth;
+  const result = randFloat()<0.5 ? "H":"T";
+
+  coin.classList.remove("cfFlipAnim"); void coin.offsetWidth;
   coin.classList.add("cfFlipAnim");
   await sleep(950);
   coin.style.transform=`rotateY(${result==="H"?0:180}deg)`;
 
   const win=(result===cf.pick);
   if(win){
-    cf.flips++;
+    const payout=Math.floor(b*COIN_PAYOUT);
+    const profit=payout-b;
+    balance+=payout; saveUser();
     showCfBanner("WIN","win");
+    toast("Coinflip","win",`+${fmt(profit)}`,2200);
   }else{
     showCfBanner("LOSE","loss");
-    cf.running=false;
-    cf.bet=0;
-    cf.flips=0;
   }
+
+  cf.running=false;
   updateCfUI();
-  $("cfMainBtn").disabled=false;
-  return win;
-}
-function cfCashout(isAuto){
-  if(!cf.running) return;
-  if(cf.flips<=0){ cf.running=false; cf.bet=0; hideCfBanner(); updateCfUI(); return; }
-  const idx=Math.min(cf.flips-1, COIN_LADDER.length-1);
-  const mult=COIN_LADDER[idx];
-  const payout=Math.floor(cf.bet*mult);
-  const profit=payout-cf.bet;
-  balance+=payout; saveUser();
-  showCfBanner(isAuto?"AUTO CASHOUT":"CASHED OUT","win");
-  cf.running=false; cf.bet=0; cf.flips=0;
-  updateCfUI();
-  setTimeout(()=>hideCfBanner(), 1100);
-  toast("Coinflip", "cashout", `+${fmt(profit)}`, 2200);
+  setTimeout(()=>hideCfBanner(), 900);
 }
 
 /* =======================
-   Dice
+   Dice (kept, tightened)
 ======================= */
-const HOUSE_EDGE = 0.01;
 function dicePayoutFromChance(chancePct){
   const p=chancePct/100;
   return (1 - HOUSE_EDGE) / p;
@@ -1097,13 +1068,14 @@ async function playDice(){
   if(!Number.isFinite(b)||b<=0||b>balance) return toast("Bet","invalid","Check amount / balance.",2400);
   const chance=Number($("diceChance").value);
   const payout=dicePayoutFromChance(chance);
+
   balance-=b; saveUser();
   $("diceBtn").disabled=true;
   $("diceRes").textContent="Rolling…";
 
-  const final=Math.random()*100;
+  const final=randFloat()*100;
   const start=performance.now();
-  const dur=900;
+  const dur=850;
 
   await new Promise(resolve=>{
     const tick=(t)=>{
@@ -1119,6 +1091,7 @@ async function playDice(){
 
   $("diceRoll").textContent=final.toFixed(2);
   const win = final < chance;
+
   if(win){
     const winAmount=Math.floor(b*payout);
     const profit=winAmount-b;
@@ -1133,41 +1106,81 @@ async function playDice(){
 }
 
 /* =======================
-   Slots
+   Slots (improved: 3 reels)
 ======================= */
+const SLOT_SYMBOLS = ["A","B","C","D","E","F"];
 function renderSlots(){
   $("content").innerHTML=`
     <div class="card">
-      <div class="cardHead"><div class="title">Slots</div><span class="tag">demo</span></div>
+      <div class="cardHead"><div class="title">Slots</div><span class="tag">3-reel</span></div>
       <div class="cardBody">
         <div class="row">
           <input id="slotsBet" class="input" type="number" min="1" step="1" placeholder="Bet amount">
           <button class="btn btnGreen" id="slotsBtn">Spin</button>
-          <span class="subtle">15% jackpot x5</span>
+          <span class="subtle">3 of a kind pays x6 (demo)</span>
         </div>
         <div class="divider"></div>
-        <div id="slotsRes" class="subtle"></div>
+        <div class="row" style="justify-content:center">
+          <div class="rollBox" id="s1">-</div>
+          <div class="rollBox" id="s2">-</div>
+          <div class="rollBox" id="s3">-</div>
+        </div>
+        <div style="height:10px"></div>
+        <div id="slotsRes" class="subtle" style="text-align:center">—</div>
       </div>
     </div>
   `;
-  $("slotsBtn").onclick=()=>{
-    const b=Math.floor(+$("slotsBet").value);
-    if(!Number.isFinite(b)||b<=0||b>balance) return toast("Bet","invalid","Check amount / balance.",2400);
-    balance-=b;
-    if(Math.random()<0.15){
-      const win=b*5;
-      balance+=win;
-      $("slotsRes").innerHTML=`<span class="win">JACKPOT</span> • +${fmt(win-b)}`;
-      toast("Slots","jackpot",`+${fmt(win-b)}`,2400);
-    }else{
-      $("slotsRes").innerHTML=`<span class="loss">LOSE</span> • -${fmt(b)}`;
-    }
+  $("slotsBtn").onclick=spinSlots;
+}
+async function spinSlots(){
+  const b=Math.floor(+$("slotsBet").value);
+  if(!Number.isFinite(b)||b<=0||b>balance) return toast("Bet","invalid","Check amount / balance.",2400);
+
+  balance-=b; saveUser();
+  $("slotsBtn").disabled=true;
+  $("slotsRes").textContent="Spinning…";
+
+  const dur=650;
+  const start=performance.now();
+  const finals=[
+    SLOT_SYMBOLS[randInt(0,SLOT_SYMBOLS.length-1)],
+    SLOT_SYMBOLS[randInt(0,SLOT_SYMBOLS.length-1)],
+    SLOT_SYMBOLS[randInt(0,SLOT_SYMBOLS.length-1)]
+  ];
+
+  await new Promise(resolve=>{
+    const tick=(t)=>{
+      const k=clamp((t-start)/dur,0,1);
+      for(let i=1;i<=3;i++){
+        const sym=SLOT_SYMBOLS[randInt(0,SLOT_SYMBOLS.length-1)];
+        $("s"+i).textContent = k>=1 ? finals[i-1] : sym;
+      }
+      if(k>=1) return resolve();
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+
+  let mult=0;
+  if(finals[0]===finals[1] && finals[1]===finals[2]) mult=6*(1-HOUSE_EDGE);
+  else if(finals[0]===finals[1] || finals[1]===finals[2] || finals[0]===finals[2]) mult=1.5*(1-HOUSE_EDGE);
+
+  if(mult>0){
+    const payout=Math.floor(b*mult);
+    const profit=payout-b;
+    balance+=payout; saveUser();
+    $("slotsRes").innerHTML=`<span class="win">WIN</span> • ${finals.join(" ")} • +${fmt(profit)} (x${mult.toFixed(2)})`;
+    toast("Slots","win",`+${fmt(profit)}`,2400);
+  }else{
+    $("slotsRes").innerHTML=`<span class="loss">LOSE</span> • ${finals.join(" ")} • -${fmt(b)}`;
     saveUser();
-  };
+  }
+
+  $("slotsBtn").disabled=false;
 }
 
 /* =======================
-   Mines
+   Mines (kept)
 ======================= */
 function comb(n,k){
   if(k<0||k>n) return 0;
@@ -1211,7 +1224,7 @@ function startMines(){
   balance-=b; saveUser();
 
   const bombSet=new Set();
-  while(bombSet.size<nb) bombSet.add(Math.floor(Math.random()*25));
+  while(bombSet.size<nb) bombSet.add(randInt(0,24));
 
   mines={bet:b, bombs:nb, bombSet, revealed:new Set(), alive:true, safe:0};
   $("minesCash").disabled=false;
@@ -1296,11 +1309,11 @@ function cashoutMines(){
 }
 
 /* =======================
-   Crash
+   Crash (kept, minor tweaks)
 ======================= */
 const CRASH_MAX = 1000;
 function crashFairPoint(){
-  const u=Math.random();
+  const u=randFloat();
   let x=(1 - HOUSE_EDGE)/Math.max(1e-9,u);
   x=Math.min(CRASH_MAX,x);
   x=Math.max(1.00, Math.floor(x*100)/100);
@@ -1344,7 +1357,7 @@ async function startCrash(){
   $("crashCash").disabled=false;
   $("crashRes").textContent="";
 
-  for(let n=3;n>=1;n--){ $("crashMsg").innerHTML=`Starting in <b>${n}</b>…`; await sleep(550); }
+  for(let n=3;n>=1;n--){ $("crashMsg").innerHTML=`Starting in <b>${n}</b>…`; await sleep(520); }
 
   const crashPoint=crashFairPoint();
   crash={bet:b, auto, crashPoint, startTime:performance.now(), mult:1.00, cashed:false, raf:null};
@@ -1353,8 +1366,7 @@ async function startCrash(){
   const tick=(t)=>{
     if(!crash) return;
     const elapsed=(t-crash.startTime)/1000;
-    const growth = 1 + elapsed*0.9;
-    let m = Math.exp(elapsed*0.56)*growth;
+    let m = Math.exp(elapsed*0.62);
     m = Math.min(m, crash.crashPoint+0.25);
     m = Math.floor(m*100)/100;
     if(m<1.00) m=1.00;
@@ -1390,8 +1402,7 @@ function cashoutCrash(){
 }
 
 /* =======================
-   Case Battles (ALL players roll simultaneously)
-   - IMPORTANT: while animations run, we DO NOT re-render the room
+   Case Battles (20 cases, pick cases, reels on player cards)
 ======================= */
 function loadBattles(){
   try{ const raw=localStorage.getItem(KEY_BATTLES); const arr=raw?JSON.parse(raw):[]; return Array.isArray(arr)?arr:[]; }
@@ -1401,44 +1412,45 @@ function saveBattles(){ localStorage.setItem(KEY_BATTLES, JSON.stringify(battles
 
 let battles=loadBattles();
 let openBattleId=null;
+let battleAnimLock=false;
 
-function battleMax(mode){ return 4; } // fixed to 1v1v1v1 style in this demo
+function battleMax(){ return 4; } // 1v1v1v1
 function sumCases(cs){ return (cs||[]).reduce((a,c)=>a+(c.price||0),0); }
 function cssId(s){ return String(s).replace(/[^a-zA-Z0-9_]/g,"_"); }
 
 function mkItems(base){
   return [
-    {name:`${base} (Common)`, value: Math.floor(20 + Math.random()*40), chance: 55},
-    {name:`${base} (Rare)`, value: Math.floor(80 + Math.random()*140), chance: 30},
-    {name:`${base} (Epic)`, value: Math.floor(250 + Math.random()*450), chance: 13},
-    {name:`${base} (Mythic)`, value: Math.floor(900 + Math.random()*2600), chance: 2},
+    {name:`${base} Common`, value: Math.floor(20 + randFloat()*40), chance: 55},
+    {name:`${base} Rare`,   value: Math.floor(80 + randFloat()*140), chance: 30},
+    {name:`${base} Epic`,   value: Math.floor(250 + randFloat()*450), chance: 13},
+    {name:`${base} Mythic`, value: Math.floor(900 + randFloat()*2600), chance: 2},
   ];
 }
 const CASES = [
   {id:"starter", name:"Starter Crate", price:50},
   {id:"sprout", name:"Sprout Crate", price:80},
-  {id:"brick", name:"Brick Crate", price:110},
-  {id:"neon", name:"Neon Crate", price:140},
-  {id:"steel", name:"Steel Crate", price:180},
-  {id:"gold", name:"Gold Crate", price:220},
-  {id:"royal", name:"Royal Crate", price:260},
-  {id:"lucky", name:"Lucky Crate", price:300},
-  {id:"party", name:"Party Crate", price:350},
-  {id:"void", name:"Void Crate", price:420},
-  {id:"prism", name:"Prism Crate", price:520},
+  {id:"brick",  name:"Brick Crate", price:110},
+  {id:"neon",   name:"Neon Crate", price:140},
+  {id:"steel",  name:"Steel Crate", price:180},
+  {id:"gold",   name:"Gold Crate", price:220},
+  {id:"royal",  name:"Royal Crate", price:260},
+  {id:"lucky",  name:"Lucky Crate", price:300},
+  {id:"party",  name:"Party Crate", price:350},
+  {id:"void",   name:"Void Crate", price:420},
+  {id:"prism",  name:"Prism Crate", price:520},
   {id:"nebula", name:"Nebula Crate", price:650},
   {id:"dragon", name:"Dragon Crate", price:800},
-  {id:"angel", name:"Angel Crate", price:950},
-  {id:"demon", name:"Demon Crate", price:1100},
-  {id:"diamond", name:"Diamond Crate", price:1400},
-  {id:"omega", name:"Omega Crate", price:1800},
+  {id:"angel",  name:"Angel Crate", price:950},
+  {id:"demon",  name:"Demon Crate", price:1100},
+  {id:"diamond",name:"Diamond Crate", price:1400},
+  {id:"omega",  name:"Omega Crate", price:1800},
   {id:"legend", name:"Legend Crate", price:2200},
-  {id:"myth", name:"Myth Crate", price:3000},
-  {id:"god", name:"God Crate", price:4200},
-].map(c=>({ ...c, icon:"", items: mkItems(c.name.replace(" Crate"," Item")) }));
+  {id:"myth",   name:"Myth Crate", price:3000},
+  {id:"god",    name:"God Crate", price:4200},
+].map(c=>({ ...c, items: mkItems(c.name.replace(" Crate"," Item")) }));
 
 function rollItemChance(items){
-  let r=Math.random()*100, acc=0;
+  let r=randFloat()*100, acc=0;
   for(const it of items){ acc+=it.chance; if(r<=acc) return it; }
   return items[items.length-1];
 }
@@ -1449,7 +1461,7 @@ function buildStrip(items, count){
     for(let i=0;i<reps;i++) pool.push(it);
   }
   const out=[];
-  for(let i=0;i<count;i++) out.push(pool[Math.floor(Math.random()*pool.length)]);
+  for(let i=0;i<count;i++) out.push(pool[randInt(0,pool.length-1)]);
   return out;
 }
 function stripItem(it){
@@ -1464,14 +1476,13 @@ function stripItem(it){
   `;
 }
 const ITEM_W = 170;
-let battleAnimLock=false; // prevents rerenders mid-animation
 
-async function animateReel(battleId, player, caseObj, finalItem){
+async function animateMiniReel(battleId, player, caseObj, finalItem){
   const stripEl=document.getElementById(`strip_${battleId}_${cssId(player)}`);
   const reelEl=document.getElementById(`reel_${battleId}_${cssId(player)}`);
   if(!stripEl || !reelEl) return;
 
-  const pre=buildStrip(caseObj.items, 26);
+  const pre=buildStrip(caseObj.items, 18);
   const seq=[...pre, finalItem, finalItem];
   stripEl.innerHTML=seq.map(stripItem).join("");
 
@@ -1486,7 +1497,7 @@ async function animateReel(battleId, player, caseObj, finalItem){
   const finalCenter = finalIndex*ITEM_W + ITEM_W/2;
   let target = finalCenter - needleX;
 
-  const overshoot = Math.max(ITEM_W*2, (Math.floor(Math.random()*3)+2)*ITEM_W);
+  const overshoot = Math.max(ITEM_W*1.5, (Math.floor(randFloat()*3)+2)*ITEM_W);
   const overspin = target - overshoot;
 
   stripEl.style.transition="transform 980ms cubic-bezier(.18,.86,.2,1)";
@@ -1498,11 +1509,6 @@ async function animateReel(battleId, player, caseObj, finalItem){
   await sleep(290);
 }
 
-/* KEY FIX:
-   For each round:
-     - start ALL reel animations in parallel (Promise.all)
-     - only after they ALL finish, apply results for ALL players
-*/
 async function runBattleSequence(id){
   const b=battles.find(x=>x.id===id);
   if(!b || b.status!=="running") return;
@@ -1514,28 +1520,25 @@ async function runBattleSequence(id){
   for(let ci=0; ci<b.cases.length; ci++){
     b.currentIndex=ci;
     saveBattles();
-    renderBattleRoom(id); // render once per round (before animations)
+    renderBattleRoom(id);
 
     const currentCase=b.cases[ci];
 
-    // Build all animations for this round
     const anims = b.players.map(async (p)=>{
       const ev=b.events.find(e=>e.caseIndex===ci && e.player===p);
       if(!ev) return;
-      await animateReel(id, p, currentCase, ev.item);
+      await animateMiniReel(id, p, currentCase, ev.item);
     });
 
-    // ALL players roll at the same time
     await Promise.all(anims);
 
-    // Apply results for ALL players together
     for(const p of b.players){
       const ev=b.events.find(e=>e.caseIndex===ci && e.player===p);
       if(!ev) continue;
       b.totals[p]+=ev.item.value;
-      b.wins[p].push({name:ev.item.name,value:ev.item.value});
+      b.lastWin[p]=ev.item;
       if(p===user){
-        balance+=ev.item.value; // auto-credit (no collect)
+        balance+=ev.item.value;
         saveUser();
       }
     }
@@ -1563,13 +1566,13 @@ function autoStartBattle(id){
   b.startedAt=Date.now();
   b.currentIndex=0;
   b.totals={};
-  b.wins={};
+  b.lastWin={};
   b.events=[];
   b._running=false;
 
-  for(const p of b.players){ b.totals[p]=0; b.wins[p]=[]; }
+  for(const p of b.players){ b.totals[p]=0; b.lastWin[p]=null; }
 
-  // Pre-roll outcomes
+  // Pre-roll outcomes for every case + every player
   for(let ci=0; ci<b.cases.length; ci++){
     const cs=b.cases[ci];
     for(const p of b.players){
@@ -1583,15 +1586,13 @@ function autoStartBattle(id){
   runBattleSequence(id);
 }
 
-function pickCase(){ return CASES[Math.floor(Math.random()*CASES.length)]; }
-
 function renderBattlesList(){
   const list=battles.map(b=>{
-    const max=battleMax(b.mode);
+    const max=battleMax();
     return `
       <div class="card" style="margin-bottom:12px">
         <div class="cardHead">
-          <div class="title">${escapeHtml(b.creator)} <span class="muted">• ${escapeHtml(b.mode)}</span></div>
+          <div class="title">${escapeHtml(b.creator)} <span class="muted">• 1v1v1v1</span></div>
           <span class="tag">${escapeHtml(b.status)}</span>
         </div>
         <div class="cardBody">
@@ -1604,7 +1605,7 @@ function renderBattlesList(){
             <button class="btnSmall btnGhost" ${(user===b.creator && b.status==="open" && b.players.length<max)?"":"disabled"} onclick="addBot('${b.id}')">Add Bot</button>
             <button class="btnSmall btnGhost btnDanger" onclick="deleteBattle('${b.id}')">Delete</button>
           </div>
-          <div class="subtle" style="margin-top:8px">Auto-starts instantly when full. Rolls happen at the same time.</div>
+          <div class="subtle" style="margin-top:8px">Auto-starts instantly when full. Rolls happen on player cards.</div>
         </div>
       </div>
     `;
@@ -1616,7 +1617,7 @@ function renderBattlesList(){
       <div class="cardBody">
         <div class="row">
           <button class="btn btnGreen" onclick="createBattle()">Create Battle</button>
-          <span class="subtle">Auto-credit to your balance.</span>
+          <span class="subtle">Pick cases (20) • Auto-credit winnings.</span>
         </div>
         <div class="divider"></div>
         ${list || `<div class="subtle">No battles yet.</div>`}
@@ -1624,17 +1625,97 @@ function renderBattlesList(){
     </div>
   `;
 }
+
 function createBattle(){
-  const id="b_"+Date.now()+"_"+Math.random().toString(16).slice(2);
-  const cases=[pickCase(), pickCase(), pickCase()];
-  battles.unshift({
-    id, creator:user, mode:"1v1v1v1", status:"open",
-    cases, players:[user], startedAt:null, currentIndex:0,
-    totals:{}, wins:{}, events:[], _running:false
+  const selected=new Set();
+  const caseCards = CASES.map(c=>{
+    return `
+      <label class="cbCaseChip" style="cursor:pointer">
+        <input type="checkbox" data-case="${escapeHtml(c.id)}" style="accent-color: rgba(56,189,248,.9)">
+        <div class="cbCaseThumb"><div class="gt"></div></div>
+        <div style="min-width:0">
+          <div style="font-weight:1000">${escapeHtml(c.name)}</div>
+          <div class="subtle">${fmt(c.price)}</div>
+        </div>
+      </label>
+    `;
+  }).join("");
+
+  modalOpen("Create Case Battle", `
+    <div class="subtle">Select 1–10 cases from the 20-case list.</div>
+    <div style="height:10px"></div>
+    <div class="row" style="align-items:center">
+      <span class="pill purple">Mode <b>1v1v1v1</b></span>
+      <span class="pill">Players <b>4</b></span>
+      <span class="spacer"></span>
+      <button class="btnGhost" id="cbPickAll">Pick 3 random</button>
+    </div>
+    <div class="divider"></div>
+
+    <div class="cbCaseRow" style="display:grid;grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:10px">
+      ${caseCards}
+    </div>
+
+    <div class="divider"></div>
+    <div class="row">
+      <span class="pill">Selected <b id="cbSelCount">0</b></span>
+      <span class="pill">Cost/player <b id="cbSelCost">0</b></span>
+      <span class="spacer"></span>
+      <button class="btn btnGreen" id="cbCreateBtn" disabled>Create</button>
+    </div>
+  `);
+
+  const update=()=>{
+    const ids=[...document.querySelectorAll('#modalBody input[type="checkbox"][data-case]')]
+      .filter(x=>x.checked).map(x=>x.getAttribute("data-case"));
+    const cases=CASES.filter(c=>ids.includes(c.id));
+    const cost=sumCases(cases);
+    $("cbSelCount").textContent=cases.length;
+    $("cbSelCost").textContent=fmt(cost);
+    $("cbCreateBtn").disabled = !(cases.length>=1 && cases.length<=10);
+  };
+
+  document.querySelectorAll('#modalBody input[type="checkbox"][data-case]').forEach(ch=>{
+    ch.onchange=()=>{
+      // hard cap 10
+      const checked=[...document.querySelectorAll('#modalBody input[type="checkbox"][data-case]')].filter(x=>x.checked);
+      if(checked.length>10){ ch.checked=false; toast("Case Battles","limit","Max 10 cases.",1600); }
+      update();
+    };
   });
-  saveBattles();
-  openBattle(id);
+
+  $("cbPickAll").onclick=()=>{
+    // clear then pick 3 random
+    document.querySelectorAll('#modalBody input[type="checkbox"][data-case]').forEach(x=>x.checked=false);
+    const pool=[...CASES];
+    for(let i=0;i<3;i++){
+      const pick=pool.splice(randInt(0,pool.length-1),1)[0];
+      const el=[...document.querySelectorAll('#modalBody input[type="checkbox"][data-case]')].find(x=>x.getAttribute("data-case")===pick.id);
+      if(el) el.checked=true;
+    }
+    update();
+  };
+
+  $("cbCreateBtn").onclick=()=>{
+    const ids=[...document.querySelectorAll('#modalBody input[type="checkbox"][data-case]')]
+      .filter(x=>x.checked).map(x=>x.getAttribute("data-case"));
+    const cases=CASES.filter(c=>ids.includes(c.id));
+    if(!(cases.length>=1 && cases.length<=10)) return;
+
+    const id="b_"+Date.now()+"_"+Math.random().toString(16).slice(2);
+    battles.unshift({
+      id, creator:user, status:"open",
+      cases, players:[user], startedAt:null, currentIndex:0,
+      totals:{}, lastWin:{}, events:[], _running:false
+    });
+    saveBattles();
+    modalClose();
+    openBattle(id);
+  };
+
+  update();
 }
+
 function deleteBattle(id){
   const i=battles.findIndex(b=>b.id===id);
   if(i>=0) battles.splice(i,1);
@@ -1649,7 +1730,7 @@ function openBattle(id){
 function joinBattle(id){
   const b=battles.find(x=>x.id===id);
   if(!b||b.status!=="open") return;
-  const max=battleMax(b.mode);
+  const max=battleMax();
   if(b.players.includes(user)) return;
   if(b.players.length>=max) return toast("Battle","full","Lobby is full.",2400);
   b.players.push(user);
@@ -1660,10 +1741,10 @@ function joinBattle(id){
 function addBot(id){
   const b=battles.find(x=>x.id===id);
   if(!b||b.status!=="open") return;
-  const max=battleMax(b.mode);
+  const max=battleMax();
   if(b.players.length>=max) return;
-  let name="Bot"+Math.floor(Math.random()*900+100);
-  if(b.players.includes(name)) name="Bot"+Math.floor(Math.random()*9000+1000);
+  let name="Bot"+Math.floor(randFloat()*900+100);
+  if(b.players.includes(name)) name="Bot"+Math.floor(randFloat()*9000+1000);
   b.players.push(name);
   saveBattles();
   renderBattleRoom(id);
@@ -1674,98 +1755,94 @@ function renderBattleRoom(id){
   const b=battles.find(x=>x.id===id);
   if(!b) return renderBattlesList();
 
-  const max=battleMax(b.mode);
+  const max=battleMax();
   const costPer=sumCases(b.cases);
-  const casesThumb=b.cases.map(()=>`<div class="cbCaseThumb"><div class="gt"></div></div>`).join("");
+
+  const casesThumb=b.cases.map(c=>`
+    <div class="cbCaseChip">
+      <div class="cbCaseThumb"><div class="gt"></div></div>
+      <div style="min-width:0">
+        <div style="font-weight:1000">${escapeHtml(c.name)}</div>
+        <div class="subtle">${fmt(c.price)}</div>
+      </div>
+    </div>
+  `).join("");
 
   const slots=[];
   for(let i=0;i<max;i++){
     const p=b.players[i];
     if(p){
+      const last=b.lastWin?.[p];
       slots.push(`
         <div class="cbSlot">
-          <div class="cbAvatar">${escapeHtml(p[0].toUpperCase())}</div>
-          <div class="cbName">
-            ${escapeHtml(p)}
-            ${isOwner(p)?`<span class="tag owner">OWNER</span>`:""}
-            ${p===user?`<span class="tag">YOU</span>`:""}
+          <div class="cbSlotTop">
+            <div class="cbAvatar">${escapeHtml(p[0].toUpperCase())}</div>
+            <div style="min-width:0">
+              <div class="cbName">
+                ${escapeHtml(p)}
+                ${isOwner(p)?`<span class="tag owner">OWNER</span>`:""}
+                ${p===user?`<span class="tag">YOU</span>`:""}
+              </div>
+              <div class="subtle">Total: <b>${fmt(b.totals?.[p]||0)}</b></div>
+            </div>
+          </div>
+
+          <div class="cbMiniReel" id="reel_${id}_${cssId(p)}">
+            <div class="cbStrip" id="strip_${id}_${cssId(p)}"></div>
+            <div class="cbNeedle"></div>
+          </div>
+
+          <div class="cbLastWin">
+            <div class="subtle">Last win</div>
+            <div style="margin-top:6px;font-weight:1000">
+              ${last ? `${escapeHtml(last.name)} • <b>${fmt(last.value)}</b>` : `<span class="muted">—</span>`}
+            </div>
           </div>
         </div>
       `);
     }else{
       slots.push(`
         <div class="cbSlot">
-          <div class="cbAvatar" style="border-color:rgba(255,255,255,.14); color:var(--muted)">+</div>
-          <div class="cbWaiting">WAITING</div>
+          <div class="cbSlotTop">
+            <div class="cbAvatar" style="border-color:rgba(255,255,255,.14); color:var(--muted)">+</div>
+            <div>
+              <div class="cbWaiting">WAITING</div>
+              <div class="subtle">Join slot</div>
+            </div>
+          </div>
           ${(user===b.creator && b.status==="open")?`<button class="btn btnGreen cbAddBot" onclick="addBot('${b.id}')">Add Bot</button>`:""}
+          <div class="cbMiniReel" style="opacity:.55">
+            <div class="cbNeedle"></div>
+          </div>
+          <div class="cbLastWin"><span class="muted">—</span></div>
         </div>
       `);
     }
   }
 
-  let arenaHtml="";
-  if(b.status!=="open"){
-    const currentCase=b.cases[Math.min(b.currentIndex, b.cases.length-1)] || b.cases[0];
-
-    const cols=b.players.map(p=>{
-      const total=b.totals?.[p]||0;
-      const wins=b.wins?.[p]||[];
-      return `
-        <div class="cbCol">
-          <div class="cbColHead"><b>${escapeHtml(p)}</b><div class="tot">Total: <b>${fmt(total)}</b></div></div>
-          <div class="cbReel" id="reel_${id}_${cssId(p)}">
-            <div class="cbStrip" id="strip_${id}_${cssId(p)}"></div>
-            <div class="cbNeedle"></div>
-          </div>
-          <div class="cbWins">
-            ${wins.slice().reverse().map(w=>`
-              <div class="cbWinCard">
-                <div class="cbWinIcon"><div class="gt gtMini"></div></div>
-                <div class="cbWinName">${escapeHtml(w.name)}</div>
-                <div class="cbWinVal">${fmt(w.value)}</div>
-              </div>
-            `).join("")}
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    arenaHtml=`
-      <div class="cbArena">
-        <div class="cbArenaTop">
-          <div class="cbCurrentCase">
-            <div class="cbCaseThumb"><div class="gt"></div></div>
-            <div>
-              ${escapeHtml(currentCase.name)}
-              <div class="subtle">${fmt(currentCase.price)}</div>
-            </div>
-          </div>
-          <div class="cbRoundInfo">${b.status==="running" ? "Rolling…" : "Finished"}</div>
-        </div>
-        <div class="cbCols">${cols}</div>
-      </div>
-    `;
-  }
+  const currentCase=b.cases[Math.min(b.currentIndex, b.cases.length-1)] || b.cases[0];
+  const statusText = b.status==="open" ? "Waiting for players…" : (b.status==="running" ? `Rolling: ${escapeHtml(currentCase.name)}` : "Finished");
 
   $("content").innerHTML=`
     <div class="card">
-      <div class="cardHead"><div class="title">Case Battle</div><span class="tag">${escapeHtml(b.mode)}</span></div>
+      <div class="cardHead"><div class="title">Case Battle</div><span class="tag">1v1v1v1</span></div>
       <div class="cardBody">
         <div class="cbTopbar">
           <button class="btnGhost" onclick="openView('battles')">← Back</button>
           <span class="pill purple">Cost/player <b>${fmt(costPer)}</b></span>
           <span class="tag">${escapeHtml(b.status)}</span>
+          <span class="spacer"></span>
+          <span class="subtle">${statusText}</span>
         </div>
 
         <div class="cbHeader">
           <div class="cbHeaderLeft">
-            <div class="cbModePills">
-              <span class="cbModePill">Auto-start</span>
-              <span class="cbModePill">All roll together</span>
-            </div>
+            <span class="tag">Cases</span>
             <div class="cbCaseRow">${casesThumb}</div>
           </div>
-          <div class="cbHeaderRight">${b.status==="open" ? `Waiting for players…` : (b.status==="running" ? `Rolling now` : `Finished`)}</div>
+          <div class="cbHeaderRight">
+            ${b.status==="open" ? `Waiting… (${b.players.length}/${max})` : (b.status==="running" ? `Round ${b.currentIndex+1}/${b.cases.length}` : `Done • ${b.cases.length} rounds`)}
+          </div>
         </div>
 
         <div class="cbSlots">${slots.join("")}</div>
@@ -1775,19 +1852,17 @@ function renderBattleRoom(id){
           <button class="btnSmall btnGhost" ${b.status==="open" && user===b.creator && b.players.length<max ? "" : "disabled"} onclick="addBot('${b.id}')">Add Bot</button>
           <button class="btnSmall btnGhost btnDanger" onclick="deleteBattle('${b.id}')">Delete</button>
         </div>
-
-        ${arenaHtml}
       </div>
     </div>
   `;
 
-  // Prime strips (only if not animating)
+  // Prime strips if not animating
   if(b.status!=="open" && !battleAnimLock){
     const cs=b.cases[Math.min(b.currentIndex, b.cases.length-1)] || b.cases[0];
     for(const p of b.players){
       const stripEl=document.getElementById(`strip_${b.id}_${cssId(p)}`);
       if(stripEl && stripEl.children.length===0){
-        stripEl.innerHTML = buildStrip(cs.items, 18).map(stripItem).join("");
+        stripEl.innerHTML = buildStrip(cs.items, 12).map(stripItem).join("");
         stripEl.style.transform="translateX(0px)";
       }
     }
@@ -1795,7 +1870,7 @@ function renderBattleRoom(id){
 }
 
 /* =======================
-   Roulette (simple red/black/green)
+   Roulette (FIXED: wheel angle decides result)
 ======================= */
 const ROU_NUMS = [
   {n:0,c:"g"}, {n:1,c:"r"}, {n:2,c:"b"}, {n:3,c:"r"}, {n:4,c:"b"},
@@ -1809,6 +1884,19 @@ const ROU_NUMS = [
   {n:35,c:"b"}, {n:36,c:"r"}
 ];
 let rouletteSpin=0;
+let rouletteBusy=false;
+
+// Map current wheel rotation to index under needle.
+// Needle at top. Our CSS wheel rotates clockwise with positive deg.
+// We want the segment that ends up at top after rotation.
+function rouletteIndexFromAngle(deg){
+  const N=ROU_NUMS.length;
+  const seg=360/N;
+  const a=((deg%360)+360)%360;        // 0..359.999
+  const top=(360 - a + seg/2) % 360;  // shift by half segment for stable rounding
+  return Math.floor(top/seg) % N;
+}
+
 function renderRoulette(){
   $("content").innerHTML=`
     <div class="card">
@@ -1826,7 +1914,7 @@ function renderRoulette(){
               <button class="btn btnGreen" id="rouBtn">Spin</button>
             </div>
             <div class="divider"></div>
-            <div class="subtle">Demo wheel: European (0–36). Colors are simplified but consistent.</div>
+            <div class="subtle">Fixed: result is derived from the wheel’s final angle.</div>
             <div class="divider"></div>
             <div class="subtle" id="rouRes">—</div>
           </div>
@@ -1842,40 +1930,51 @@ function renderRoulette(){
   `;
   $("rouBtn").onclick=spinRoulette;
 }
+
 async function spinRoulette(){
+  if(rouletteBusy) return;
   const b=Math.floor(+$("rouBet").value);
   if(!Number.isFinite(b)||b<=0||b>balance) return toast("Bet","invalid","Check amount / balance.",2400);
+
+  rouletteBusy=true;
+  $("rouBtn").disabled=true;
 
   const pick=$("rouPick").value;
   balance-=b; saveUser();
 
   const wheel=$("rouWheel");
   wheel.classList.add("wheelSpin");
+
   rouletteSpin += 360*randInt(3,6) + randInt(0,359);
   wheel.style.transform=`rotate(${rouletteSpin}deg)`;
 
   await sleep(1850);
   wheel.classList.remove("wheelSpin");
 
-  const result=ROU_NUMS[randInt(0,ROU_NUMS.length-1)];
+  const idx=rouletteIndexFromAngle(rouletteSpin);
+  const result=ROU_NUMS[idx];
+
   $("rouLast").textContent = `${result.n} (${result.c==="r"?"R":result.c==="b"?"B":"G"})`;
 
   let payout=0;
   if(pick===result.c){
     const mult = pick==="g" ? 14 : 2;
-    payout = Math.floor(b*mult);
-    balance+=payout;
+    payout = Math.floor(b*mult*(1-HOUSE_EDGE*0.5)); // tiny edge touch
     const profit=payout-b;
+    balance+=payout;
     $("rouRes").innerHTML = `<span class="win">WIN</span> • +${fmt(profit)} • landed ${result.n}`;
     toast("Roulette","win",`+${fmt(profit)}`,2400);
   }else{
     $("rouRes").innerHTML = `<span class="loss">LOSE</span> • -${fmt(b)} • landed ${result.n}`;
   }
   saveUser();
+
+  rouletteBusy=false;
+  $("rouBtn").disabled=false;
 }
 
 /* =======================
-   Plinko (simple path simulation)
+   Plinko (kept)
 ======================= */
 const PLINKO_BUCKETS = [
   {m:0.3},{m:0.5},{m:0.8},{m:1.2},{m:2.0},{m:1.2},{m:0.8},{m:0.5},{m:0.3}
@@ -1894,11 +1993,9 @@ function renderPlinko(){
 
         <div class="grid2">
           <div class="panelBox">
-            <div class="subtle">Pegs (visual). Drop randomly left/right per row.</div>
+            <div class="subtle">Drop randomly left/right per row.</div>
             <div style="height:10px"></div>
-            <div class="plinkoBoard" id="plBoard"></div>
-            <div style="height:10px"></div>
-            <div class="row" id="plBuckets" style="justify-content:center"></div>
+            <div id="plBuckets" class="row" style="justify-content:center;gap:8px;flex-wrap:wrap"></div>
           </div>
           <div class="panelBox" style="display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center">
             <div class="bigNum mono" id="plPath">—</div>
@@ -1908,16 +2005,8 @@ function renderPlinko(){
       </div>
     </div>
   `;
-  // board pegs
-  const board=$("plBoard");
-  board.innerHTML="";
-  for(let i=0;i<9*8;i++){
-    const d=document.createElement("div");
-    d.className="peg";
-    board.appendChild(d);
-  }
   const buck=$("plBuckets");
-  buck.innerHTML = PLINKO_BUCKETS.map(x=>`<div class="slot mono">${x.m.toFixed(2)}x</div>`).join("");
+  buck.innerHTML = PLINKO_BUCKETS.map(x=>`<div class="pill mono">${x.m.toFixed(2)}x</div>`).join("");
   $("plDrop").onclick=dropPlinko;
 }
 async function dropPlinko(){
@@ -1925,17 +2014,17 @@ async function dropPlinko(){
   if(!Number.isFinite(b)||b<=0||b>balance) return toast("Bet","invalid","Check amount / balance.",2400);
   balance-=b; saveUser();
 
-  let pos=4; // center bucket index
+  let pos=4;
   let path="";
   for(let r=0;r<8;r++){
-    const dir=Math.random()<0.5 ? -1 : 1;
+    const dir=randFloat()<0.5 ? -1 : 1;
     pos=clamp(pos+dir,0,8);
     path += dir===-1 ? "L" : "R";
     $("plPath").textContent=path;
-    await sleep(120);
+    await sleep(110);
   }
 
-  const mult=PLINKO_BUCKETS[pos].m;
+  const mult=PLINKO_BUCKETS[pos].m*(1-HOUSE_EDGE*0.5);
   const payout=Math.floor(b*mult);
   const profit=payout-b;
   if(payout>0) balance+=payout;
@@ -1948,7 +2037,7 @@ async function dropPlinko(){
 }
 
 /* =======================
-   Hi-Lo
+   Hi-Lo (kept)
 ======================= */
 let hilo=null;
 function renderHiLo(){
@@ -1987,8 +2076,7 @@ function renderHiLo(){
   hilo=null;
 }
 function hiloMultFromStreak(s){
-  // simple curve
-  return Math.floor((1 + s*0.35 + s*s*0.02)*100)/100;
+  return Math.floor((1 + s*0.35 + s*s*0.02)*(1-HOUSE_EDGE)*100)/100;
 }
 function hiloStart(){
   const b=Math.floor(+$("hlBet").value);
@@ -2046,12 +2134,20 @@ function hiloCash(){
 }
 
 /* =======================
-   Wheel
+   Wheel (FIXED: angle decides segment)
 ======================= */
-const WHEEL = [
-  {m:0.2},{m:0.5},{m:1.0},{m:1.2},{m:1.5},{m:2.0},{m:3.0},{m:5.0}
-];
+const WHEEL = [{m:0.2},{m:0.5},{m:1.0},{m:1.2},{m:1.5},{m:2.0},{m:3.0},{m:5.0}];
 let wheelSpin=0;
+let wheelBusy=false;
+
+function wheelIndexFromAngle(deg){
+  const N=WHEEL.length;
+  const seg=360/N;
+  const a=((deg%360)+360)%360;
+  const top=(360 - a + seg/2) % 360;
+  return Math.floor(top/seg)%N;
+}
+
 function renderWheel(){
   $("content").innerHTML=`
     <div class="card">
@@ -2064,7 +2160,7 @@ function renderWheel(){
               <button class="btn btnGreen" id="whSpin">Spin</button>
             </div>
             <div class="divider"></div>
-            <div class="subtle">Segments: ${WHEEL.map(x=>x.m.toFixed(2)+"x").join(" • ")}</div>
+            <div class="subtle">Fixed: segment is derived from final wheel angle.</div>
             <div class="divider"></div>
             <div class="subtle" id="whRes">—</div>
           </div>
@@ -2090,8 +2186,13 @@ function renderWheel(){
   $("whSpin").onclick=spinWheel;
 }
 async function spinWheel(){
+  if(wheelBusy) return;
   const b=Math.floor(+$("whBet").value);
   if(!Number.isFinite(b)||b<=0||b>balance) return toast("Bet","invalid","Check amount / balance.",2400);
+
+  wheelBusy=true;
+  $("whSpin").disabled=true;
+
   balance-=b; saveUser();
 
   const w=$("whWheel");
@@ -2102,8 +2203,8 @@ async function spinWheel(){
   await sleep(1850);
   w.classList.remove("wheelSpin");
 
-  const idx=randInt(0, WHEEL.length-1);
-  const mult=WHEEL[idx].m;
+  const idx=wheelIndexFromAngle(wheelSpin);
+  const mult=WHEEL[idx].m*(1-HOUSE_EDGE*0.5);
   $("whLast").textContent = mult.toFixed(2)+"x";
 
   const payout=Math.floor(b*mult);
@@ -2113,11 +2214,15 @@ async function spinWheel(){
   $("whRes").innerHTML = `Result <b>${mult.toFixed(2)}x</b> • `+
     (profit>=0?`<span class="win">+${fmt(profit)}</span>`:`<span class="loss">-${fmt(-profit)}</span>`);
   saveUser();
+
   if(profit>=0) toast("Wheel","win",`+${fmt(profit)}`,2200);
+
+  wheelBusy=false;
+  $("whSpin").disabled=false;
 }
 
 /* =======================
-   Keno
+   Keno (kept)
 ======================= */
 let kenoPick=new Set();
 function renderKeno(){
@@ -2186,17 +2291,14 @@ function buildKenoGrid(){
   $("knCount").textContent=kenoPick.size;
 }
 function kenoPayout(picks, hits){
-  // tiny demo table (not a real keno table)
   if(picks===0) return 0;
   const base = Math.max(1, picks);
   const ratio = hits / base;
-  // favors higher hits
   let mult = 0;
   if(ratio>=1) mult = 6 + hits*0.8;
   else if(ratio>=0.7) mult = 2.5 + hits*0.35;
   else if(ratio>=0.5) mult = 1.2 + hits*0.15;
   else mult = 0.0;
-  // house edge-ish
   mult = mult * (1 - HOUSE_EDGE);
   return Math.floor(mult*100)/100;
 }
@@ -2207,7 +2309,6 @@ function kenoDraw(){
 
   balance-=b; saveUser();
 
-  // draw 10 unique numbers
   const drawn=new Set();
   while(drawn.size<10) drawn.add(randInt(1,40));
   const drawnArr=[...drawn].sort((a,b)=>a-b);
@@ -2237,8 +2338,9 @@ function kenoDraw(){
   renderLeft();
   const last=localStorage.getItem(KEY_LAST);
   if(last){
-    const rec=getUserRec(last);
-    if(rec.password){ user=last; balance=Number(rec.balance||0); }
+    const canon=findCanonicalUser(last);
+    const rec=getUserRec(canon);
+    if(rec.password){ user=canon; balance=Number(rec.balance||0); }
   }
   updateTopbar();
   openView("home");
